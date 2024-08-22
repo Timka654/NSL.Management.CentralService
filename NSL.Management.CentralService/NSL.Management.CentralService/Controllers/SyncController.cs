@@ -37,12 +37,10 @@ namespace NSL.Management.CentralService.Controllers
 
                     return log;
                 }));
+                
+                await dbContext.SaveChangesAsync();
 
-                var dbq = dbContext.ServerLogs
-                .Include(x => x.Server)
-                .Filter(x => x.Where(x => x.Server.OwnerId == uid), query);
-
-                return this.DataResponse(await dbq.ToDataResultAsync(x => x.SelectGet()));
+                return Ok();
 
             });
     }

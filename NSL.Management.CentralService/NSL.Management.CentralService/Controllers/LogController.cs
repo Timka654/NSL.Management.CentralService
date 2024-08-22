@@ -53,7 +53,7 @@ namespace NSL.Management.CentralService.Controllers
             });
 
         [HttpPostAction]
-        public async Task<IActionResult> Remove([FromBody] ClearLogsRequestModel query)
+        public async Task<IActionResult> Clear([FromBody] ClearLogsRequestModel query)
             => await this.ProcessRequestAsync(async () =>
             {
                 var uid = User.GetId();

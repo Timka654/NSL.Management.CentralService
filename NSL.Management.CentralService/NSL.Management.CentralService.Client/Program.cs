@@ -9,6 +9,7 @@ using NSL.ASPNET.Identity.ClientIdentity.Providers;
 using NSL.Management.CentralService.Client.Services;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Web;
+using System.Net;
 namespace NSL.Management.CentralService.Client
 {
     internal class Program
@@ -28,6 +29,7 @@ namespace NSL.Management.CentralService.Client
                 })
                 .AddHttpMessageIdentityHandler();
 
+            builder.Services.AddBlazorBootstrap();
             builder.Services.AddBlazoredLocalStorageAsSingleton();
 
             builder.Services
@@ -36,6 +38,8 @@ namespace NSL.Management.CentralService.Client
                 .AddIdentityStateProvider<IdentityStateProvider>()
                 .AddIdentityService<HubIdentityService>()
                 .AddIdentityAuthorizationService<IdentityAuthorizationService>();
+
+            builder.Services.AddSingleton<ServersService>();
 
             //builder.Services.AddAuthorizationCore();
             //builder.Services.AddCascadingAuthenticationState();

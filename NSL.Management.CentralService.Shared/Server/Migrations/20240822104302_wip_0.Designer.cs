@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NSL.Management.CentralService.Shared.Server.Data;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace NSL.Management.CentralService.Shared.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240822104302_wip_0")]
+    partial class wip_0
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -197,7 +200,8 @@ namespace NSL.Management.CentralService.Shared.Server.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OwnerId");
+                    b.HasIndex("OwnerId")
+                        .IsUnique();
 
                     b.ToTable("Servers");
                 });
@@ -331,8 +335,8 @@ namespace NSL.Management.CentralService.Shared.Server.Migrations
             modelBuilder.Entity("NSL.Management.CentralService.Shared.Models.ServerModel", b =>
                 {
                     b.HasOne("NSL.Management.CentralService.Shared.Models.UserModel", "Owner")
-                        .WithMany("Servers")
-                        .HasForeignKey("OwnerId")
+                        .WithOne("Server")
+                        .HasForeignKey("NSL.Management.CentralService.Shared.Models.ServerModel", "OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -346,7 +350,7 @@ namespace NSL.Management.CentralService.Shared.Server.Migrations
 
             modelBuilder.Entity("NSL.Management.CentralService.Shared.Models.UserModel", b =>
                 {
-                    b.Navigation("Servers");
+                    b.Navigation("Server");
                 });
 #pragma warning restore 612, 618
         }

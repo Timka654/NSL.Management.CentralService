@@ -6,7 +6,7 @@ namespace NSL.Management.CentralService.Shared.Models
 {
     public partial class UserModel : IdentityUser
     {
-        public virtual ServerModel? Server { get; set; }
+        public virtual List<ServerModel>? Servers { get; set; }
     }
 }
 

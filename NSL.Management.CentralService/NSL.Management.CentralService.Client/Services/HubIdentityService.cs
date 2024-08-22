@@ -22,7 +22,9 @@ namespace NSL.Management.CentralService.Client.Services
             if (!await localStorage.ContainKeyAsync(StorageKey))
                 return default;
 
-            return await localStorage.GetItemAsStringAsync(StorageKey);
+            var token =  await localStorage.GetItemAsStringAsync(StorageKey);
+
+            return token;
         }
 
         protected override async Task SaveToken(string? token)
@@ -33,7 +35,7 @@ namespace NSL.Management.CentralService.Client.Services
                 return;
             }
 
-            await localStorage.SetItemAsync(StorageKey, token);
+            await localStorage.SetItemAsStringAsync(StorageKey, token);
         }
     }
 }

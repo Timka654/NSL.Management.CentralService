@@ -1,0 +1,38 @@
+﻿@page "/servers"
+@using Microsoft.AspNetCore.Authorization
+
+@attribute [Authorize]
+
+<PageTitle>ManagePage</PageTitle>
+
+<Accordion Class="pt-2">
+    <AccordionItem>
+        <TitleTemplate>
+            <Icon Name="IconName.HouseFill" Class="me-1" /> Create new
+        </TitleTemplate>
+        <Content>
+
+            <EditForm Model="createRequestData" OnValidSubmit="CreateHandle">
+                <div class="mb-3">
+                    <label class="form-label">Name</label>
+                    <input @bind="createRequestData.Name" class="form-control"/>
+                </div>
+                <div class="mb-3">
+                    <Button Type="ButtonType.Submit">Create</Button>
+                </div>
+            </EditForm>
+
+        </Content>
+    </AccordionItem>
+</Accordion>
+
+<hr />
+<Grid TItem="ServerModel" AllowPaging="true" AllowFiltering="true" AllowSorting="true" DataProvider="GridDataProvider">
+    <GridColumn TItem="ServerModel" PropertyName="@nameof(ServerModel.Id)" HeaderText="@nameof(ServerModel.Id)">@context.Id</GridColumn>
+    <GridColumn TItem="ServerModel" PropertyName="@nameof(ServerModel.Name)" HeaderText="@nameof(ServerModel.Name)">@context.Name</GridColumn>
+    <GridColumn TItem="ServerModel" PropertyName="@nameof(ServerModel.IdentityKey)" HeaderText="@nameof(ServerModel.IdentityKey)">@context.IdentityKey</GridColumn>
+    <GridColumn TItem="ServerModel"HeaderText="Actions">
+        <Button Type="ButtonType.Link" To="@($"servers/details/{@context.Id}")">Details</Button>
+        <Button @onclick="()=> Remove(context)" Color="ButtonColor.Danger">Remove</Button>
+    </GridColumn>
+</Grid>

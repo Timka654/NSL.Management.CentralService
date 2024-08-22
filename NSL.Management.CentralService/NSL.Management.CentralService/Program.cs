@@ -9,6 +9,7 @@ using NSL.Management.CentralService.Shared.Models;
 using NSL.Management.CentralService.Shared.Server.Data;
 using NSL.Management.CentralService.Shared.Server.Manages;
 using NSL.Management.CentralService.Utils.Sync;
+using System.Net;
 
 namespace NSL.Management.CentralService
 {
@@ -18,7 +19,11 @@ namespace NSL.Management.CentralService
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers()
+            .AddJsonOptions(o =>
+            {
+                o.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+            });
 
             // Add services to the container.
             builder.Services.AddRazorComponents()
@@ -37,6 +42,28 @@ namespace NSL.Management.CentralService
                 .AddSignInManager<AppSignInManager>()
                 .AddUserManager<AppUserManager>()
                 .AddRoleManager<AppRoleManager>();
+
+            builder.Services.AddDefaultAuthenticationForAPIBaseJWT()
+                .AddAPIBaseJWTBearer(builder.Configuration);
+
+            builder.Services.ConfigureApplicationCookie(c =>
+            {
+                c.Events = new Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationEvents()
+                {
+                    OnRedirectToAccessDenied = c =>
+                    {
+                        c.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+
+                        return Task.CompletedTask;
+                    },
+                    OnRedirectToLogin = c =>
+                    {
+                        c.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+
+                        return Task.CompletedTask;
+                    }
+                };
+            });
 
             builder.Services.AddSyncIdentityService();
 
@@ -61,6 +88,8 @@ namespace NSL.Management.CentralService
             }
 
             app.UseHttpsRedirection();
+
+            app.UseAuth();
 
             app.UseStaticFiles();
             //app.UseAntiforgery();

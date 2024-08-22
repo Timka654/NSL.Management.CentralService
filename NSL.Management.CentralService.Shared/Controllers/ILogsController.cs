@@ -8,14 +8,18 @@ using NSL.Generators.HttpEndPointGenerator.Shared.Fake.Interfaces;
 using NSL.Generators.HttpEndPointGenerator.Shared.Attributes;
 using NSL.Management.CentralService.Shared.Models.RequestModels;
 using NSL.HttpClient.Models;
+using NSL.Database.EntityFramework.Filter.Models;
+using NSL.Management.CentralService.Shared.Models;
 
 namespace NSL.Management.CentralService.Shared.Controllers
 {
     [HttpEndPointContainerGenerate("api/[controller]")]
     public interface ILogController
     {
-        //[HttpEndPointGenerate(typeof(DataResponse<string>))] Task<IActionResult> Login([FromBody] IdentityLoginRequestModel query);
+        [HttpEndPointGenerate(typeof(BaseResponse))] Task<IActionResult> Clear([FromBody] ClearLogsRequestModel query);
 
-        //[HttpEndPointGenerate(typeof(DataResponse<string>))] Task<IActionResult> Register([FromBody] IdentityRegisterRequestModel query);
+        [HttpEndPointGenerate(typeof(DataResponse<FilterResultModel<ServerLogModel>>))] Task<IActionResult> Get([FromBody] BaseFilteredQueryModel query);
+
+        [HttpEndPointGenerate(typeof(DataResponse<ServerLogModel>))] Task<IActionResult> GetDetails([FromBody] Guid query);
     }
 }
