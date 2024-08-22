@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>aspnet-NSL.Management.CentralService-f83f2a79-6a83-426b-b529-95e52f86d468</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\NSL.Management.CentralService.Shared\NSL.Management.CentralService.Shared.Server.csproj" />
+    <ProjectReference Include="..\NSL.Management.CentralService.Client\NSL.Management.CentralService.Client.csproj" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.7" />
+    <PackageReference Include="NSL.ASPNET.Identity.Host" Version="2024.8.13.1657" />
+    <PackageReference Include="NSL.ASPNET.Mvc" Version="2024.8.13.1657" />
+    <PackageReference Include="NSL.Database.EntityFramework.ASPNET" Version="2024.8.13.1657" />
+    <PackageReference Include="NSL.Database.EntityFramework.Filter.Host.ASPNET" Version="2024.8.20.1021" />
+    <PackageReference Include="NSL.Refactoring.Shared" Version="2024.8.13.1657">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>

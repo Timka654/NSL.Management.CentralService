@@ -1,0 +1,2 @@
+$temp = Read-Host "migration name"
+dotnet ef database update $temp --project "NSL.Management.CentralService.Shared/NSL.Management.CentralService.Shared.Server.csproj" --msbuildprojectextensionspath "Teaching/artifacts/Teaching/obj"
