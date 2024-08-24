@@ -1,0 +1,48 @@
+﻿@page "/servers/details/{DetailId:guid}"
+
+<PageTitle>DetailsPage</PageTitle>
+
+@if (Details == null)
+{
+    <h3>Loading...</h3>
+    return;
+}
+
+<h3>@Details.Name</h3>
+
+<hr />
+
+<Tabs>
+    <Tab Title="Details">
+        <Content>
+            <dl>
+                <dt>Id</dt>
+                <dd>@Details.Id</dd>
+
+                <dt>Name</dt>
+                <dd>@Details.Name</dd>
+
+                <dt>Token</dt>
+                <dd>@Details.IdentityKey</dd>
+            </dl>
+
+        </Content>
+    </Tab>
+    <Tab Title="Logs" OnClick="LoadLogs">
+        <Content>
+            @if (Logs != null)
+            {
+                <div style="height: 75vh;overflow-y:auto">
+                    <Button Style="width:100%">Load Prev</Button>
+
+                    @foreach (var item in Logs)
+                    {
+                        <p>@item.CreateTime - @item.LogLevel - @item.Content</p>
+                    }
+
+                    <Button Style="width:100%">Load New</Button>
+                </div>
+            }
+        </Content>
+    </Tab>
+</Tabs>

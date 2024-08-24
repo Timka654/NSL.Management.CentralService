@@ -1,4 +1,6 @@
-﻿using NSL.Generators.SelectTypeGenerator.Attributes;
+﻿using NSL.Generators.FillTypeGenerator.Attributes;
+using NSL.Generators.SelectTypeGenerator.Attributes;
+using NSL.Management.CentralService.Shared.Enums;
 
 namespace NSL.Management.CentralService.Shared.Models
 {
@@ -12,6 +14,7 @@ namespace NSL.Management.CentralService.Shared.Models
 
         [SelectGenerateInclude("Get")]
         public DateTime CreateTime { get; set; }
+
 
         public Guid ServerId { get; set; }
 

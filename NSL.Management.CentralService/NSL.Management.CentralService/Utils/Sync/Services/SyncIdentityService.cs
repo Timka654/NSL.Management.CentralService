@@ -21,6 +21,7 @@ namespace NSL.Management.CentralService.Utils.Sync.Services
             if (store.TryGetValue(serverId, out var identityData))
             {
                 identityData.LastGet = DateTime.UtcNow;
+
                 if (identityData.Token != identityToken)
                     return false;
 
@@ -42,13 +43,12 @@ namespace NSL.Management.CentralService.Utils.Sync.Services
             if (identityData == null || identityData.Token != identityToken)
                 return false;
 
+            context.HttpContext.Items["serverId"] = serverId;
+
             return true;
         }
 
         private ConcurrentDictionary<Guid, SyncIdentityKeyData> store = new();
-
-        //private ConcurrentQueue<SyncIdentityKeyData> clearQueue = new();
-
 
         public void ClearCache()
         {

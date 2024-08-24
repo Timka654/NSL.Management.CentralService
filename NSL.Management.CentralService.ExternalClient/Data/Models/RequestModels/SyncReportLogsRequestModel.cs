@@ -1,20 +1,19 @@
-﻿#if SERVER
+﻿using NSL.Management.CentralService.ExternalClient.Data.Enums;
 
-using NSL.Generators.FillTypeGenerator.Attributes;
-
-namespace NSL.Management.CentralService.Shared.Models.RequestModels
+namespace NSL.Management.CentralService.ExternalClient.Data.Models.RequestModels
 {
     public partial class SyncReportLogsRequestModel
     {
         public SyncReportLogDataModel[] Logs { get; set; }
     }
-    [FillTypeGenerate(typeof(ServerLogModel))]
+
+
     public partial class SyncReportLogDataModel
     {
         public string Content { get; set; }
 
         public DateTime CreateTime { get; set; }
+
+        public LogLevelEnum LogLevel { get; set; }
     }
 }
-
-#endif

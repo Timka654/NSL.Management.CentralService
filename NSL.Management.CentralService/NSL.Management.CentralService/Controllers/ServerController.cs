@@ -28,7 +28,7 @@ namespace NSL.Management.CentralService.Controllers
 
                 var dbq = dbContext.Servers.Filter(x => x.Where(x => x.OwnerId == uid), query);
 
-                return this.DataResponse(await dbq.ToDataResultAsync(x=>x.SelectGet()));
+                return this.DataResponse(await dbq.ToDataResultAsync(x => x.SelectGet()));
 
             });
 
@@ -80,8 +80,8 @@ namespace NSL.Management.CentralService.Controllers
                     .FirstOrDefaultAsync();
 
                 if (details != null)
-                { 
-                query.FillTo(details);
+                {
+                    query.FillTo(details);
 
                     await dbContext.SaveChangesAsync();
                 }
@@ -96,7 +96,7 @@ namespace NSL.Management.CentralService.Controllers
                 var uid = User.GetId();
 
                 var count = await dbContext.Servers
-                    .Where(x => x.OwnerId == uid && x.Id == query)    
+                    .Where(x => x.OwnerId == uid && x.Id == query)
                     .ExecuteDeleteAsync();
 
                 return Ok();

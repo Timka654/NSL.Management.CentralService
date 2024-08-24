@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "NSL.Management.CentralService.ExternalClient.ASPNET": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:18431;http://localhost:18432"
+    }
+  }
+}

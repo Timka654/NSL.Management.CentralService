@@ -4,6 +4,8 @@
 		<OutputType>Library</OutputType>
 		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<IsPackable>false</IsPackable>
+		<Version>$(VersionSuffix)</Version>
 		<Nullable>enable</Nullable>
 		<RootNamespace>NSL.Management.CentralService.Shared</RootNamespace>
 	</PropertyGroup>
@@ -31,22 +33,26 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="NSL.Database.EntityFramework.Filter" Version="2024.8.20.1021" />
-		<PackageReference Include="NSL.Generators.FillTypeGenerator" Version="2024.8.13.1657" />
-		<PackageReference Include="NSL.Generators.FillTypeGenerator.Attributes" Version="2024.8.13.1657" />
-		<PackageReference Include="NSL.Generators.HttpEndPointGenerator.Shared" Version="2024.8.13.1657" />
-		<PackageReference Include="NSL.Generators.SelectTypeGenerator" Version="2024.8.13.1657" />
-		<PackageReference Include="NSL.Generators.SelectTypeGenerator.Attributes" Version="2024.8.13.1657" />
-		<PackageReference Include="NSL.HttpClient" Version="2024.8.13.1657" />
-		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.7" />
-		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.7" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.7" />
+		<PackageReference Include="NSL.Database.EntityFramework.Filter" Version="2024.8.24.2059" />
+		<PackageReference Include="NSL.Generators.FillTypeGenerator" Version="2024.8.24.2059" />
+		<PackageReference Include="NSL.Generators.FillTypeGenerator.Attributes" Version="2024.8.24.2059" />
+		<PackageReference Include="NSL.Generators.HttpEndPointGenerator.Shared" Version="2024.8.24.2059" />
+		<PackageReference Include="NSL.Generators.SelectTypeGenerator" Version="2024.8.24.2059" />
+		<PackageReference Include="NSL.Generators.SelectTypeGenerator.Attributes" Version="2024.8.24.2059" />
+		<PackageReference Include="NSL.HttpClient" Version="2024.8.24.2059" />
+		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.8" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.8" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.8">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
-		<PackageReference Include="NSL.Refactoring.Shared" Version="2024.8.13.1657">
+		<PackageReference Include="NSL.Refactoring.Shared" Version="2024.8.24.2059">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 	</ItemGroup>
+
 	<!--Uncomment this for link appsettings in asp.net project-->
 	<!--<ItemGroup>
 		<Content Include="..\$BaseProject$\appsettings.Development.json" Link="appsettings.Development.json" Condition="'$(Configuration)'=='Debug'">

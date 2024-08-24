@@ -22,18 +22,18 @@ namespace NSL.Management.CentralService.Controllers
         ) : Controller, ISyncController
     {
         [HttpPostAction]
-        public async Task<IActionResult> Get([FromBody] SyncReportLogsRequestModel query)
+        public async Task<IActionResult> LogReport([FromBody] SyncReportLogsRequestModel query)
             => await this.ProcessRequestAsync(async () =>
             {
                 var serverId = this.GetSyncServerId();
-
-                var uid = User.GetId();
 
                 dbContext.ServerLogs.AddRange(query.Logs.Select(x =>
                 {
                     var log = new ServerLogModel();
 
-                    x.FillTo(log);
+                    log.FillFrom(x);
+
+                    log.ServerId = serverId;
 
                     return log;
                 }));

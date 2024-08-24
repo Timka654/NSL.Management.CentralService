@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using NSL.ASPNET.Identity.Host;
@@ -67,8 +68,12 @@ namespace NSL.Management.CentralService
 
             builder.Services.AddSyncIdentityService();
 
-
             var app = builder.Build();
+
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
 
             await app.AcceptDbMigrations<ApplicationDbContext>();
 
@@ -86,8 +91,9 @@ namespace NSL.Management.CentralService
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
+#if DEBUG
             app.UseHttpsRedirection();
+#endif
 
             app.UseAuth();
 
