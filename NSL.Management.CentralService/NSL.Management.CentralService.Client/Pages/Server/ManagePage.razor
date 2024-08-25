@@ -27,7 +27,7 @@
 </Accordion>
 
 <hr />
-<Grid TItem="ServerModel" AllowPaging="true" AllowFiltering="true" AllowSorting="true" DataProvider="GridDataProvider">
+<Grid @ref="gridRef" TItem="ServerModel" AllowPaging="true" AllowFiltering="true" AllowSorting="true" DataProvider="GridDataProvider">
     <GridColumn TItem="ServerModel" PropertyName="@nameof(ServerModel.Id)" HeaderText="@nameof(ServerModel.Id)">@context.Id</GridColumn>
     <GridColumn TItem="ServerModel" PropertyName="@nameof(ServerModel.Name)" HeaderText="@nameof(ServerModel.Name)">@context.Name</GridColumn>
     <GridColumn TItem="ServerModel" PropertyName="@nameof(ServerModel.IdentityKey)" HeaderText="@nameof(ServerModel.IdentityKey)">@context.IdentityKey</GridColumn>

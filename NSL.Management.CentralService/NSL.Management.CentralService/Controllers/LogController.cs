@@ -32,6 +32,19 @@ namespace NSL.Management.CentralService.Controllers
                 return this.DataResponse(await dbq.ToDataResultAsync(x => x.SelectGet()));
 
             });
+        [HttpPostAction]
+        public async Task<IActionResult> GetCount([FromBody] Guid serverId)
+            => await this.ProcessRequestAsync(async () =>
+            {
+                var uid = User.GetId();
+
+                var count = await dbContext.ServerLogs
+                .Where(x => x.ServerId == serverId && x.Server.OwnerId == uid)
+                .CountAsync(); ;
+
+                return this.DataResponse(count);
+
+            });
 
         [HttpPostAction]
         public async Task<IActionResult> GetDetails([FromBody] Guid query)

@@ -33,14 +33,20 @@
             @if (Logs != null)
             {
                 <div style="height: 75vh;overflow-y:auto">
-                    <Button Style="width:100%">Load Prev</Button>
+                    @if (havePrevLogs)
+                    {
+                        <Button Style="width:100%" @onclick="logsLoadPrev">Load Prev (30)</Button>
+                    }
 
                     @foreach (var item in Logs)
                     {
                         <p>@item.CreateTime - @item.LogLevel - @item.Content</p>
                     }
 
-                    <Button Style="width:100%">Load New</Button>
+                    @if (haveNextLogs)
+                    {
+                        <Button Style="width:100%" @onclick="logsLoadNext">Load Next(@(newLogsCount - logsCount))</Button>
+                    }
                 </div>
             }
         </Content>
