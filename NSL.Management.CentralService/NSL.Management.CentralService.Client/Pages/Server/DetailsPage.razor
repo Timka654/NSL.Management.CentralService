@@ -1,4 +1,5 @@
 ﻿@page "/servers/details/{DetailId:guid}"
+@using NSL.Management.CentralService.Shared.Enums
 
 <PageTitle>DetailsPage</PageTitle>
 
@@ -30,6 +31,42 @@
     </Tab>
     <Tab Title="Logs" OnClick="LoadLogs">
         <Content>
+
+
+            <Accordion Class="pt-2">
+                <AccordionItem>
+                    <TitleTemplate>
+                        <Icon Name="IconName.HouseFill" Class="me-1" /> Filter
+                    </TitleTemplate>
+                    <Content>
+                        <div class="mb-3">
+                            <label class="form-label">From</label>
+                            <input type="datetime-local" @bind="filterFrom" class="form-control" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">To</label>
+                            <input type="datetime-local" @bind="filterTo" class="form-control" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Level</label>
+                            <select @bind="filterLevel">
+                                <option value=""></option>
+                                @foreach (var item in Enum.GetValues<LogLevelEnum>())
+                                {
+                                    <option value="@item.ToString()">@item.ToString()</option>
+
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <Button Type="ButtonType.Button" @onclick="_loadLogs">Set</Button>
+                            <Button Type="ButtonType.Button" @onclick="clearFilter">Clear</Button>
+                        </div>
+
+                    </Content>
+                </AccordionItem>
+            </Accordion>
+
             @if (Logs != null)
             {
                 <div style="height: 75vh;overflow-y:auto">
@@ -43,7 +80,7 @@
                         <p>@item.CreateTime - @item.LogLevel - @item.Content</p>
                     }
 
-                    @if (haveNextLogs)
+                    @if (haveNextLogs && !HaveFilter)
                     {
                         <Button Style="width:100%" @onclick="logsLoadNext">Load Next(@(newLogsCount - logsCount))</Button>
                     }

@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components;
 using NSL.Database.EntityFramework.Filter;
+using NSL.Database.EntityFramework.Filter.Models;
 using NSL.Management.CentralService.Client.Services;
+using NSL.Management.CentralService.Shared.Enums;
 using NSL.Management.CentralService.Shared.Models;
 
 namespace NSL.Management.CentralService.Client.Pages.Server
@@ -35,16 +37,39 @@ namespace NSL.Management.CentralService.Client.Pages.Server
 
         bool havePrevLogs => logsCount > Logs.Count;
 
+        DateTime? filterFrom = null;
+
+        DateTime? filterTo = null;
+
+        LogLevelEnum? filterLevel = null;
+
+        bool HaveFilter => filterFrom != null || filterTo != null || filterLevel != null;
+
+        async Task clearFilter()
+        {
+            filterFrom = null;
+            filterTo = null;
+            filterLevel = null;
+
+            await _loadLogs();
+        }
+
         async Task LoadLogs()
         {
             if (Logs != null)
                 return;
 
+            await _loadLogs();
+
+            logsNewCountGetting();
+        }
+        async Task _loadLogs()
+        {
             var filter = NavigationFilterBuilder
                 .Create()
                 .SetOffset(0)
                 .SetCount(30)
-                .CreateFilterBlock(x => x.AddFilter(nameof(ServerLogModel.ServerId), Database.EntityFramework.Filter.Enums.CompareType.Equals, DetailId))
+                .CreateFilterBlock(x => SetFilters(x).AddFilter(nameof(ServerLogModel.ServerId), Database.EntityFramework.Filter.Enums.CompareType.Equals, DetailId))
                 .AddOrder(nameof(ServerLogModel.CreateTime), false);
 
             var response = await ServersService.LogGetPostRequest(filter);
@@ -55,8 +80,6 @@ namespace NSL.Management.CentralService.Client.Pages.Server
             newLogsCount = logsCount = response.Data.Count;
 
             Logs = response.Data.Data.Reverse().ToList();
-
-            logsNewCountGetting();
         }
 
 
@@ -76,7 +99,7 @@ namespace NSL.Management.CentralService.Client.Pages.Server
                 .Create()
                 .SetOffset((int)newOffset)
                 .SetCount((int)count)
-                .CreateFilterBlock(x => x.AddFilter(nameof(ServerLogModel.ServerId), Database.EntityFramework.Filter.Enums.CompareType.Equals, DetailId))
+                .CreateFilterBlock(x => SetFilters(x).AddFilter(nameof(ServerLogModel.ServerId), Database.EntityFramework.Filter.Enums.CompareType.Equals, DetailId))
                 .AddOrder(nameof(ServerLogModel.CreateTime));
 
             var response = await ServersService.LogGetPostRequest(filter);
@@ -97,7 +120,7 @@ namespace NSL.Management.CentralService.Client.Pages.Server
                 .Create()
                 .SetOffset((int)logsCount)
                 .SetCount((int)(nlc - logsCount))
-                .CreateFilterBlock(x => x.AddFilter(nameof(ServerLogModel.ServerId), Database.EntityFramework.Filter.Enums.CompareType.Equals, DetailId))
+                .CreateFilterBlock(x => SetFilters(x).AddFilter(nameof(ServerLogModel.ServerId), Database.EntityFramework.Filter.Enums.CompareType.Equals, DetailId))
                 .AddOrder(nameof(ServerLogModel.CreateTime));
 
             var response = await ServersService.LogGetPostRequest(filter);
@@ -109,7 +132,22 @@ namespace NSL.Management.CentralService.Client.Pages.Server
 
             newLogsCount = response.Data.Count;
 
-            Logs = response.Data.Data.Concat(Logs).ToList();
+            Logs = Logs.Concat(response.Data.Data).ToList();
+        }
+
+        private FilterBlockViewModel SetFilters(FilterBlockViewModel block)
+        {
+            if (HaveFilter)
+            {
+                if (filterFrom.HasValue)
+                    block.AddFilter(nameof(ServerLogModel.CreateTime), Database.EntityFramework.Filter.Enums.CompareType.More, filterFrom.Value);
+                if (filterTo.HasValue)
+                    block.AddFilter(nameof(ServerLogModel.CreateTime), Database.EntityFramework.Filter.Enums.CompareType.Less, filterTo.Value);
+                if (filterLevel.HasValue)
+                    block.AddFilter(nameof(ServerLogModel.LogLevel), Database.EntityFramework.Filter.Enums.CompareType.Equals, filterLevel.Value);
+            }
+
+            return block;
         }
 
         private async void logsNewCountGetting()
