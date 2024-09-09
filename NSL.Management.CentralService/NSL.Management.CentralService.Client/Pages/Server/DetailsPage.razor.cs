@@ -63,12 +63,15 @@ namespace NSL.Management.CentralService.Client.Pages.Server
 
             logsNewCountGetting();
         }
+
+        private const int loadCount = 100;
+
         async Task _loadLogs()
         {
             var filter = NavigationFilterBuilder
                 .Create()
                 .SetOffset(0)
-                .SetCount(30)
+                .SetCount(loadCount)
                 .CreateFilterBlock(x => SetFilters(x).AddFilter(nameof(ServerLogModel.ServerId), Database.EntityFramework.Filter.Enums.CompareType.Equals, DetailId))
                 .AddOrder(nameof(ServerLogModel.CreateTime), false);
 
@@ -85,9 +88,9 @@ namespace NSL.Management.CentralService.Client.Pages.Server
 
         private async Task logsLoadPrev()
         {
-            var newOffset = logsCount - Logs.Count - 30;
+            var newOffset = logsCount - Logs.Count - loadCount;
 
-            var count = 30L;
+            var count = (long)loadCount;
 
             if (newOffset < 0)
             {
