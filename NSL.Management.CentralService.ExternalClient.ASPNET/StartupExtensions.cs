@@ -26,13 +26,13 @@ namespace NSL.Management.CentralService.ExternalClient.ASPNET
             return builder;
         }
 
-        public static ILoggingBuilder AddCentralServiceLogger(
-            this ILoggingBuilder builder
+        public static IServiceCollection AddCentralServiceLogger(
+            this IServiceCollection services
             , TimeSpan delayReport)
         {
-            builder.Services.AddSingleton<ILoggerProvider>((s) => new CentralServiceLogProvider(s, delayReport));
+            services.AddSingleton<ILoggerProvider>((s) => new CentralServiceLogProvider(s, delayReport));
 
-            return builder;
+            return services;
         }
     }
 
@@ -58,58 +58,55 @@ namespace NSL.Management.CentralService.ExternalClient.ASPNET
 
     public static partial class StartupExtensions
     {
-        public static void AddCentralServiceReportOnUnhandledException(this IHost s, bool requireReport = true)
+        public static void AddCentralServiceReportOnUnhandledException(this IHost s, int maxTryToReport = 2)
         {
-            var lps = s.Services.GetRequiredService<IEnumerable<ILoggerProvider>>();
+            s.Services.AddCentralServiceReportOnUnhandledException(maxTryToReport);
+        }
 
-            var lp = lps.FirstOrDefault(x => x is CentralServiceLogProvider);
+        public static void AddCentralServiceReportOnClose(this IHost s, int maxTryToReport = 2)
+        {
+            s.Services.AddCentralServiceReportOnClose(maxTryToReport);
+        }
 
-            if (lp == null)
-                throw new Exception($"CentralServiceLogProvider not registered!!");
-
+        /// <summary>
+        /// Add unhandled exception handle for all available centralService providers can report before shutdown
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="requireReport"></param>
+        public static void AddCentralServiceReportOnUnhandledException(this IServiceProvider s, int maxTryToReport = 2)
+        {
             AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
             {
-                var ex = (e.ExceptionObject as Exception).ToString();
+                var lps = s.GetRequiredService<IEnumerable<ILoggerProvider>>();
 
-                var createTime = DateTime.UtcNow;
-
-                (lp as CentralServiceLogProvider).EnqueueLog(new Data.Models.RequestModels.SyncReportLogDataModel() { Content = $"[-1]     APPLICATION - {ex}", CreateTime = DateTime.UtcNow, LogLevel = Data.Enums.LogLevelEnum.Critical });
-
-                bool finished = false;
-
-                do
+                var lp = lps?.FirstOrDefault(x => x is CentralServiceLogProvider);
+                if (lp != null)
                 {
-                    finished = WaitCentralServiceLoggerReport(s.Services);
-                } while (!finished && requireReport);
+                    var ex = (e.ExceptionObject as Exception).ToString();
 
-                finished = false;
+                    var createTime = DateTime.UtcNow;
 
-                do
-                {
-                    finished = WaitCentralServiceMetricsReport(s.Services);
-                } while (!finished && requireReport);
+                    (lp as CentralServiceLogProvider).EnqueueLog(new Data.Models.RequestModels.SyncReportLogDataModel() { Content = $"[-1]     APPLICATION - {ex}", CreateTime = DateTime.UtcNow, LogLevel = Data.Enums.LogLevelEnum.Critical });
+                }
+
+                TryReport(() => WaitCentralServiceLoggerReport(s), maxTryToReport);
+                TryReport(() => WaitCentralServiceMetricsReport(s), maxTryToReport);
             };
         }
 
-        public static void AddCentralServiceReportOnClose(this IHost s, bool requireReport = true)
+        /// <summary>
+        /// Add process close handle for all available centralService providers can report before shutdown
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="requireReport"></param>
+        public static void AddCentralServiceReportOnClose(this IServiceProvider s, int maxTryToReport = 2)
         {
-            var lps = s.Services.GetRequiredService<IEnumerable<ILoggerProvider>>();
+            var lps = s.GetRequiredService<IEnumerable<ILoggerProvider>>();
 
             AppDomain.CurrentDomain.ProcessExit += (sender, e) =>
             {
-                bool finished = false;
-
-                do
-                {
-                    finished = WaitCentralServiceLoggerReport(s.Services);
-                } while (!finished && requireReport);
-
-                finished = false;
-
-                do
-                {
-                    finished = WaitCentralServiceMetricsReport(s.Services);
-                } while (!finished && requireReport);
+                TryReport(() => WaitCentralServiceLoggerReport(s), maxTryToReport);
+                TryReport(() => WaitCentralServiceMetricsReport(s), maxTryToReport);
             };
         }
     }
@@ -137,6 +134,21 @@ namespace NSL.Management.CentralService.ExternalClient.ASPNET
         }
     }
 
+    public static partial class StartupExtensions
+    {
+        private static bool TryReport(Func<bool> report, int maxTry)
+        {
+            bool success = false;
+
+            for (int i = 0; i < maxTry && !success; i++)
+            {
+                success = report();
+            }
+
+            return success;
+        }
+
+    }
     public static partial class StartupExtensions
     {
         public static bool WaitCentralServiceLoggerReport(this IServiceProvider s)
