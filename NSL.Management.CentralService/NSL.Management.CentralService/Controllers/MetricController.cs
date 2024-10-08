@@ -7,7 +7,6 @@ using NSL.ASPNET.Mvc.Route.Attributes;
 using NSL.Database.EntityFramework.Filter.Host;
 using NSL.Database.EntityFramework.Filter.Models;
 using NSL.Management.CentralService.Shared.Controllers;
-using NSL.Management.CentralService.Shared.Models;
 using NSL.Management.CentralService.Shared.Models.RequestModels;
 using NSL.Management.CentralService.Shared.Server.Data;
 
@@ -15,9 +14,9 @@ namespace NSL.Management.CentralService.Controllers
 {
     [Route("api/[controller]")]
     [Authorize]
-    public class LogController(ApplicationDbContext dbContext,
+    public class MetricController(ApplicationDbContext dbContext,
         IConfiguration configuration
-        ) : Controller, ILogController
+        ) : Controller, IMetricController
     {
         [HttpPostAction]
         public async Task<IActionResult> Get([FromBody] EntityFilterQueryModel query)
@@ -25,7 +24,7 @@ namespace NSL.Management.CentralService.Controllers
             {
                 var uid = User.GetId();
 
-                var dbq = dbContext.ServerLogs
+                var dbq = dbContext.ServerMetrics
                 .Include(x => x.Server)
                 .Filter(x => x.Where(x => x.Server.OwnerId == uid), query);
 
@@ -38,7 +37,7 @@ namespace NSL.Management.CentralService.Controllers
             {
                 var uid = User.GetId();
 
-                var count = await dbContext.ServerLogs
+                var count = await dbContext.ServerMetrics
                 .Where(x => x.ServerId == serverId && x.Server.OwnerId == uid)
                 .CountAsync(); ;
 
@@ -52,7 +51,7 @@ namespace NSL.Management.CentralService.Controllers
             {
                 var uid = User.GetId();
 
-                var details = await dbContext.ServerLogs
+                var details = await dbContext.ServerMetrics
                 .Include(x => x.Server)
                     .Where(x => x.Server.OwnerId == uid && x.Id == query)
                     .SelectDetails()
@@ -66,12 +65,12 @@ namespace NSL.Management.CentralService.Controllers
             });
 
         [HttpPostAction]
-        public async Task<IActionResult> Clear([FromBody] ClearLogsRequestModel query)
+        public async Task<IActionResult> Clear([FromBody] ClearMetricsRequestModel query)
             => await this.ProcessRequestAsync(async () =>
             {
                 var uid = User.GetId();
 
-                var dbq = dbContext.ServerLogs
+                var dbq = dbContext.ServerMetrics
                 .Include(x => x.Server)
                     .Where(x => x.Server.OwnerId == uid && x.ServerId == query.ServerId);
 

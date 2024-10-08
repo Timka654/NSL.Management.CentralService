@@ -11,6 +11,8 @@ namespace NSL.Management.CentralService.Shared.Models
         public virtual string OwnerId { get; set; }
 
         public virtual List<ServerLogModel>? Logs { get; set; }
+
+        public virtual List<ServerMetricsModel>? Metrics { get; set; }
     }
 }
 

@@ -1,22 +1,19 @@
 ﻿using NSL.Management.CentralService.ExternalClient.Data.Models.RequestModels;
 using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.Text;
 
 namespace NSL.Management.CentralService.ExternalClient.ASPNET
 {
-    public class CentralServiceLogProvider : ILoggerProvider
+    public class CentralServiceMetricsProvider
     {
-        private readonly ConcurrentDictionary<string, CentralServiceLogger> _loggers =
+        private readonly ConcurrentDictionary<string, DateTime> _increment =
             new(StringComparer.OrdinalIgnoreCase);
+
         internal static TimeSpan DefaultReportDelay = TimeSpan.FromSeconds(30);
 
         private readonly IServiceProvider serviceProvider;
         public TimeSpan delayTime { get; } = DefaultReportDelay;
 
-        long logId = 0;
-
-        public CentralServiceLogProvider(IServiceProvider serviceProvider, TimeSpan? delayTime = null)
+        public CentralServiceMetricsProvider(IServiceProvider serviceProvider, TimeSpan? delayTime = null)
         {
             this.serviceProvider = serviceProvider;
             this.delayTime = delayTime ?? DefaultReportDelay;
@@ -29,26 +26,26 @@ namespace NSL.Management.CentralService.ExternalClient.ASPNET
             {
                 await Task.Delay(delayTime);
 
-                logReport();
+                metricReport();
             }
         }
 
-        private async void logReport()
+        private async void metricReport()
         {
-            var l = logs;
+            var l = metrics;
 
-            logs = new ConcurrentBag<SyncReportLogDataModel>();
+            metrics = new ConcurrentBag<SyncReportMetricDataModel>();
 
-            var result = await serviceProvider.GetRequiredService<CentralServiceClient>().LogReportAsync(new SyncReportLogsRequestModel()
+            var result = await serviceProvider.GetRequiredService<CentralServiceClient>().MetricsReportAsync(new SyncReportMetricsRequestModel()
             {
-                Logs = l.ToArray()
+                Metrics = l.ToArray()
             });
 
             if (!result)
             {
                 foreach (var item in l)
                 {
-                    logs.Add(item);
+                    metrics.Add(item);
                 }
             }
             else
@@ -61,20 +58,35 @@ namespace NSL.Management.CentralService.ExternalClient.ASPNET
         }
 
 
-        public ILogger CreateLogger(string categoryName) =>
-            _loggers.GetOrAdd(categoryName, name => new CentralServiceLogger(name, this));
-
-        private ConcurrentBag<SyncReportLogDataModel> logs = new();
+        private ConcurrentBag<SyncReportMetricDataModel> metrics = new();
 
         private AutoResetEvent _clearLocker = new AutoResetEvent(true);
 
-        internal void EnqueueLog(SyncReportLogDataModel record)
+        internal void EnqueueMetric(SyncReportMetricDataModel record)
         {
-            logs.Add(record);
+            if (record.OperationType == MetricsOperationType.Increment)
+            {
+                if (_increment.TryGetValue(record.Name, out var old_time))
+                {
+                    if (record.ValidInterval.HasValue)
+                    {
+                        while (record.CreateTime - old_time < record.ValidInterval)
+                        {
+                            old_time = old_time + record.ValidInterval.Value;
+                        }
+                    }
+
+                    record.CreateTime = old_time;
+                }
+
+                _increment.AddOrUpdate(record.Name, record.CreateTime, (n, o) => record.CreateTime);
+            }
+
+            metrics.Add(record);
         }
 
         public void Dispose()
-            => _loggers.Clear();
+            => metrics.Clear();
 
         public bool WaitForReport()
         {
@@ -99,7 +111,7 @@ namespace NSL.Management.CentralService.ExternalClient.ASPNET
                 if (ow == null)
                     ow = waitToken = new CancellationTokenSource();
 
-                logReport();
+                metricReport();
 
                 await Task.Delay(Timeout.Infinite, ow.Token);
             }

@@ -1,6 +1,6 @@
 ﻿#if CLIENT
 
-using NSL.Management.CentralService.Shared.Enums;
+using NSL.Management.CentralService.ExternalClient.Data.Enums;
 
 namespace NSL.Management.CentralService.Shared.Models
 {

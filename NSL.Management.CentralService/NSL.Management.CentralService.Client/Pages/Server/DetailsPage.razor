@@ -1,5 +1,5 @@
 ﻿@page "/servers/details/{DetailId:guid}"
-@using NSL.Management.CentralService.Shared.Enums
+@using NSL.Management.CentralService.ExternalClient.Data.Enums
 
 <PageTitle>DetailsPage</PageTitle>
 
@@ -41,15 +41,19 @@
                     <Content>
                         <div class="mb-3">
                             <label class="form-label">From</label>
-                            <input type="datetime-local" @bind="filterFrom" class="form-control" />
+                            <input type="datetime-local" @bind="filterLogsFrom" class="form-control" />
                         </div>
                         <div class="mb-3">
                             <label class="form-label">To</label>
-                            <input type="datetime-local" @bind="filterTo" class="form-control" />
+                            <input type="datetime-local" @bind="filterLogsTo" class="form-control" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Contains content</label>
+                            <input type="text" @bind="searchLogsText" class="form-control" />
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Level</label>
-                            <select @bind="filterLevel">
+                            <select @bind="filterLogsLevel">
                                 <option value=""></option>
                                 @foreach (var item in Enum.GetValues<LogLevelEnum>())
                                 {
@@ -60,7 +64,7 @@
                         </div>
                         <div class="mb-3">
                             <Button Type="ButtonType.Button" @onclick="_loadLogs">Set</Button>
-                            <Button Type="ButtonType.Button" @onclick="clearFilter">Clear</Button>
+                            <Button Type="ButtonType.Button" @onclick="clearLogsFilter">Clear</Button>
                         </div>
 
                     </Content>
@@ -69,7 +73,7 @@
 
             @if (Logs != null)
             {
-                <div style="height: 75vh;overflow-y:auto">
+                <div style="height: 65vh;overflow-y:auto">
                     @if (havePrevLogs)
                     {
                         <Button Style="width:100%" @onclick="logsLoadPrev">Load Prev (100)</Button>
@@ -80,9 +84,57 @@
                         <p>@item.CreateTime - @item.LogLevel - @item.Content</p>
                     }
 
-                    @if (haveNextLogs && !HaveFilter)
+                    @if (haveNextLogs && !HaveLogsFilter)
                     {
                         <Button Style="width:100%" @onclick="logsLoadNext">Load Next(@(newLogsCount - logsCount))</Button>
+                    }
+                </div>
+            }
+        </Content>
+    </Tab>
+    <Tab Title="Metrics" OnClick="LoadMetrics">
+        <Content>
+
+
+            <Accordion Class="pt-2">
+                <AccordionItem>
+                    <TitleTemplate>
+                        <Icon Name="IconName.HouseFill" Class="me-1" /> Filter
+                    </TitleTemplate>
+                    <Content>
+                        <div class="mb-3">
+                            <label class="form-label">From</label>
+                            <input type="datetime-local" @bind="filterMetricsFrom" class="form-control" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">To</label>
+                            <input type="datetime-local" @bind="filterMetricsTo" class="form-control" />
+                        </div>
+                        <div class="mb-3">
+                            <Button Type="ButtonType.Button" @onclick="_loadMetrics">Set</Button>
+                            <Button Type="ButtonType.Button" @onclick="clearMetricsFilter">Clear</Button>
+                        </div>
+
+                    </Content>
+                </AccordionItem>
+            </Accordion>
+
+            @if (Metrics != null)
+            {
+                <div style="height: 65vh;overflow-y:auto">
+                    @if (havePrevMetrics)
+                    {
+                        <Button Style="width:100%" @onclick="metricsLoadPrev">Load Prev (100)</Button>
+                    }
+
+                    @foreach (var item in Metrics)
+                    {
+                        <p>@item.Name - @item.CreateTime - @item.Value</p>
+                    }
+
+                    @if (haveNextMetrics && !HaveMetricsFilter)
+                    {
+                        <Button Style="width:100%" @onclick="metricsLoadNext">Load Next(@(newMetricsCount - metricsCount))</Button>
                     }
                 </div>
             }

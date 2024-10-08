@@ -21,7 +21,7 @@ namespace NSL.Management.CentralService.Controllers
         ) : Controller, IServerController
     {
         [HttpPostAction]
-        public async Task<IActionResult> Get([FromBody] BaseFilteredQueryModel query)
+        public async Task<IActionResult> Get([FromBody] EntityFilterQueryModel query)
             => await this.ProcessRequestAsync(async () =>
             {
                 var uid = User.GetId();

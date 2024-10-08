@@ -10,8 +10,4 @@
 		<Authors>Relife87</Authors>
 	</PropertyGroup>
 
-	<ItemGroup>
-	  <ProjectReference Include="..\NSL.Management.CentralService.ExternalShared\NSL.Management.CentralService.ExternalShared.csproj" />
-	</ItemGroup>
-
 </Project>

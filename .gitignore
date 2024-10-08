@@ -2,3 +2,6 @@
 bin/
 obj/
 /build/
+/publish/
+*.pubxml.user
+*.csproj.user

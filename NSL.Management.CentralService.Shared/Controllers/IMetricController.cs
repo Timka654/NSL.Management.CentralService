@@ -14,14 +14,14 @@ using NSL.Management.CentralService.Shared.Models;
 namespace NSL.Management.CentralService.Shared.Controllers
 {
     [HttpEndPointContainerGenerate("api/[controller]")]
-    public interface ILogController
+    public interface IMetricController
     {
-        [HttpEndPointGenerate(typeof(BaseResponse))] Task<IActionResult> Clear([FromBody] ClearLogsRequestModel query);
+        [HttpEndPointGenerate(typeof(BaseResponse))] Task<IActionResult> Clear([FromBody] ClearMetricsRequestModel query);
 
-        [HttpEndPointGenerate(typeof(DataResponse<FilterResultModel<ServerLogModel>>))] Task<IActionResult> Get([FromBody] EntityFilterQueryModel query);
+        [HttpEndPointGenerate(typeof(DataResponse<FilterResultModel<ServerMetricsModel>>))] Task<IActionResult> Get([FromBody] EntityFilterQueryModel query);
 
         [HttpEndPointGenerate(typeof(DataResponse<long>))] Task<IActionResult> GetCount([FromBody] Guid serverId);
 
-        [HttpEndPointGenerate(typeof(DataResponse<ServerLogModel>))] Task<IActionResult> GetDetails([FromBody] Guid query);
+        [HttpEndPointGenerate(typeof(DataResponse<ServerMetricsModel>))] Task<IActionResult> GetDetails([FromBody] Guid query);
     }
 }

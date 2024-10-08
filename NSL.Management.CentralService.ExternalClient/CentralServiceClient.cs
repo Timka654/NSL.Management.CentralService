@@ -18,6 +18,9 @@ namespace NSL.Management.CentralService.ExternalClient
             set { baseUrl = value; if (!baseUrl.EndsWith('/')) baseUrl += "/"; }
         }
 
+        public int LogReportRequestTimeout { get; set; } = 10;
+        public int MetricsReportRequestTimeout { get; set; } = 10;
+
         public required Guid ServerId { get; init; }
 
         public required string ServerToken { get; init; }
@@ -34,9 +37,35 @@ namespace NSL.Management.CentralService.ExternalClient
 
             using var client = CreateClient();
 
+            client.Timeout = TimeSpan.FromSeconds(LogReportRequestTimeout);
+
             try
             {
                 using var response = await client.PostAsync(LogReportUrl, GetJsonContent(data));
+
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception)
+            {
+            }
+
+            return false;
+        }
+
+        private const string MetricsReportUrl = $"{ApiBaseUrl}/MetricsReport";
+
+        public async Task<bool> MetricsReportAsync(SyncReportMetricsRequestModel data)
+        {
+            if (!data.Metrics.Any())
+                return true;
+
+            using var client = CreateClient();
+
+            client.Timeout = TimeSpan.FromSeconds(MetricsReportRequestTimeout);
+
+            try
+            {
+                using var response = await client.PostAsync(MetricsReportUrl, GetJsonContent(data));
 
                 return response.IsSuccessStatusCode;
             }
@@ -57,7 +86,8 @@ namespace NSL.Management.CentralService.ExternalClient
         {
             var hc = new HttpClient()
             {
-                BaseAddress = new Uri(BaseUrl)
+                BaseAddress = new Uri(BaseUrl),
+                Timeout = TimeSpan.FromSeconds(20)
             };
 
             hc.DefaultRequestHeaders.Add("server_id", ServerId.ToString());

@@ -13,9 +13,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Management.CentralServi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Management.CentralService.ExternalClient", "NSL.Management.CentralService.ExternalClient\NSL.Management.CentralService.ExternalClient.csproj", "{E7A57C31-005F-4B24-A651-370124D6740C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSL.Management.CentralService.ExternalClient.ASPNET", "NSL.Management.CentralService.ExternalClient.ASPNET\NSL.Management.CentralService.ExternalClient.ASPNET.csproj", "{3A103994-8081-459D-85DA-30FF2BD5D962}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Management.CentralService.ExternalClient.ASPNET", "NSL.Management.CentralService.ExternalClient.ASPNET\NSL.Management.CentralService.ExternalClient.ASPNET.csproj", "{3A103994-8081-459D-85DA-30FF2BD5D962}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSL.Management.CentralService.Test", "NSL.Management.CentralService.Test\NSL.Management.CentralService.Test.csproj", "{D8937DB0-5FD5-4B2A-969F-6D0CC516FC22}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSL.Management.CentralService.Test", "NSL.Management.CentralService.Test\NSL.Management.CentralService.Test.csproj", "{D8937DB0-5FD5-4B2A-969F-6D0CC516FC22}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{27FDC187-CFE5-4102-BEDC-8A2BD87FEA71}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSL.Management.CentralService.ExternalShared", "NSL.Management.CentralService.ExternalShared\NSL.Management.CentralService.ExternalShared.csproj", "{233A36A8-1AB3-4114-AEE9-E88941922B83}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -96,6 +100,16 @@ Global
 		{D8937DB0-5FD5-4B2A-969F-6D0CC516FC22}.Unity|Any CPU.Build.0 = Debug|Any CPU
 		{D8937DB0-5FD5-4B2A-969F-6D0CC516FC22}.UnityDebug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D8937DB0-5FD5-4B2A-969F-6D0CC516FC22}.UnityDebug|Any CPU.Build.0 = Debug|Any CPU
+		{233A36A8-1AB3-4114-AEE9-E88941922B83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{233A36A8-1AB3-4114-AEE9-E88941922B83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{233A36A8-1AB3-4114-AEE9-E88941922B83}.DebugExamples|Any CPU.ActiveCfg = Debug|Any CPU
+		{233A36A8-1AB3-4114-AEE9-E88941922B83}.DebugExamples|Any CPU.Build.0 = Debug|Any CPU
+		{233A36A8-1AB3-4114-AEE9-E88941922B83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{233A36A8-1AB3-4114-AEE9-E88941922B83}.Release|Any CPU.Build.0 = Release|Any CPU
+		{233A36A8-1AB3-4114-AEE9-E88941922B83}.Unity|Any CPU.ActiveCfg = Debug|Any CPU
+		{233A36A8-1AB3-4114-AEE9-E88941922B83}.Unity|Any CPU.Build.0 = Debug|Any CPU
+		{233A36A8-1AB3-4114-AEE9-E88941922B83}.UnityDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{233A36A8-1AB3-4114-AEE9-E88941922B83}.UnityDebug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -33,24 +33,33 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="NSL.Database.EntityFramework.Filter" Version="2024.8.24.2059" />
-		<PackageReference Include="NSL.Generators.FillTypeGenerator" Version="2024.8.24.2059" />
-		<PackageReference Include="NSL.Generators.FillTypeGenerator.Attributes" Version="2024.8.24.2059" />
-		<PackageReference Include="NSL.Generators.HttpEndPointGenerator.Shared" Version="2024.8.24.2059" />
-		<PackageReference Include="NSL.Generators.SelectTypeGenerator" Version="2024.8.24.2059" />
-		<PackageReference Include="NSL.Generators.SelectTypeGenerator.Attributes" Version="2024.8.24.2059" />
-		<PackageReference Include="NSL.HttpClient" Version="2024.8.24.2059" />
+		<PackageReference Include="NSL.Database.EntityFramework.Filter" Version="2024.10.4.1349" />
+		<PackageReference Include="NSL.Database.EntityFramework.Filter.Host" Version="2024.10.4.1349" />
+		<PackageReference Include="NSL.Generators.FillTypeGenerator" Version="2024.10.4.1349" />
+		<PackageReference Include="NSL.Generators.FillTypeGenerator.Attributes" Version="2024.10.4.1349" />
+		<PackageReference Include="NSL.Generators.HttpEndPointGenerator.Shared" Version="2024.10.4.1349" />
+		<PackageReference Include="NSL.Generators.SelectTypeGenerator" Version="2024.10.4.1349" />
+		<PackageReference Include="NSL.Generators.SelectTypeGenerator.Attributes" Version="2024.10.4.1349" />
+		<PackageReference Include="NSL.HttpClient" Version="2024.10.4.1349" />
 		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.8" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.8" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.8">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
-		<PackageReference Include="NSL.Refactoring.Shared" Version="2024.8.24.2059">
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.8" />
+		<PackageReference Include="NSL.Refactoring.Shared" Version="2024.10.4.1349">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\NSL.Management.CentralService.ExternalShared\NSL.Management.CentralService.ExternalShared.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Enums\" />
 	</ItemGroup>
 
 	<!--Uncomment this for link appsettings in asp.net project-->

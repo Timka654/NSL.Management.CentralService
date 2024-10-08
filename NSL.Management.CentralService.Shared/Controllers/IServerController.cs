@@ -20,7 +20,7 @@ namespace NSL.Management.CentralService.Shared.Controllers
 
         [HttpEndPointGenerate(typeof(BaseResponse))] Task<IActionResult> Edit([FromBody] EditServerRequestModel query);
 
-        [HttpEndPointGenerate(typeof(DataResponse<FilterResultModel<ServerModel>>))] Task<IActionResult> Get([FromBody] BaseFilteredQueryModel query);
+        [HttpEndPointGenerate(typeof(DataResponse<FilterResultModel<ServerModel>>))] Task<IActionResult> Get([FromBody] EntityFilterQueryModel query);
 
         [HttpEndPointGenerate(typeof(DataResponse<ServerModel>))] Task<IActionResult> GetDetails([FromBody] Guid query);
 

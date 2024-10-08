@@ -6,6 +6,7 @@ using NSL.ASPNET.Mvc;
 using NSL.ASPNET.Mvc.Route.Attributes;
 using NSL.Database.EntityFramework.Filter.Host;
 using NSL.Database.EntityFramework.Filter.Models;
+using NSL.Management.CentralService.ExternalClient.Data.Models.RequestModels;
 using NSL.Management.CentralService.Shared.Controllers;
 using NSL.Management.CentralService.Shared.Models;
 using NSL.Management.CentralService.Shared.Models.RequestModels;
@@ -30,6 +31,45 @@ namespace NSL.Management.CentralService.Controllers
                 dbContext.ServerLogs.AddRange(query.Logs.Select(x =>
                 {
                     var log = new ServerLogModel();
+
+                    log.FillFrom(x);
+
+                    log.ServerId = serverId;
+
+                    return log;
+                }));
+                
+                await dbContext.SaveChangesAsync();
+
+                return Ok();
+
+            });
+        [HttpPostAction]
+        public async Task<IActionResult> MetricsReport([FromBody] SyncReportMetricsRequestModel query)
+            => await this.ProcessRequestAsync(async () =>
+            {
+                var serverId = this.GetSyncServerId();
+
+                var dbMetrics = dbContext.ServerMetrics.Where(x => x.ServerId == serverId);
+
+                foreach (var item in query.Metrics.Where(x=>x.OperationType == MetricsOperationType.Increment).ToArray())
+                {
+                    var dbitem = await dbMetrics.FirstOrDefaultAsync(x => x.Name == item.Name && (item.ValidInterval.HasValue && x.CreateTime == item.CreateTime));
+
+                    if (dbitem != null)
+                    {
+                        dbitem.Value += item.Value;
+                        continue;
+                    }
+
+                    item.OperationType = MetricsOperationType.New;
+                }
+
+                dbContext.ServerMetrics.AddRange(query.Metrics
+                    .Where(x=>x.OperationType == MetricsOperationType.New)
+                    .Select(x =>
+                {
+                    var log = new ServerMetricsModel();
 
                     log.FillFrom(x);
 

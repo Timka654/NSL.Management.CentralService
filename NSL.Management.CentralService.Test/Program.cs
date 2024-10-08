@@ -19,7 +19,7 @@ namespace NSL.Management.CentralService.Test
             //    BaseUrl = "http://localhost:5055/"
             //});
 
-            builder.Services.AddCentalServiceClient(() => new ExternalClient.CentralServiceClient()
+            builder.Services.AddCentralServiceClient(() => new ExternalClient.CentralServiceClient()
             {
                 ServerId = Guid.Parse("5fd5459e-bde2-45de-8b80-2b8670b0a3f4"),
                 ServerToken = "33d65a1e-2e7e-4194-8b98-17e3d8f2665de1964618-cd2c-4dc9-9f83-a70b81628468",

@@ -7,7 +7,7 @@ namespace NSL.Management.CentralService.ExternalClient.ASPNET
 {
     public static class StartupExtensions
     {
-        public static IServiceCollection AddCentalServiceClient(
+        public static IServiceCollection AddCentralServiceClient(
             this IServiceCollection collection, Func<CentralServiceClient> build)
         {
             collection.AddSingleton<CentralServiceClient>(s => build());
@@ -32,7 +32,7 @@ namespace NSL.Management.CentralService.ExternalClient.ASPNET
             return builder;
         }
 
-        public static void WaitCentralServiceLoggerReport(this IServiceProvider s)
+        public static bool WaitCentralServiceLoggerReport(this IServiceProvider s)
         {
             var lps = s.GetRequiredService<IEnumerable<ILoggerProvider>>();
 
@@ -41,10 +41,10 @@ namespace NSL.Management.CentralService.ExternalClient.ASPNET
             if (lp == null)
                 throw new Exception($"CentralServiceLogProvider not registered!!");
 
-            (lp as CentralServiceLogProvider).WaitForReport();
+           return (lp as CentralServiceLogProvider).WaitForReport();
         }
 
-        public static void AddCentralServiceLoggerReportOnClose(this IHost s)
+        public static void AddCentralServiceLoggerReportOnUnhandledException(this IHost s, bool requireReport = true)
         {
             var lps = s.Services.GetRequiredService<IEnumerable<ILoggerProvider>>();
 
@@ -59,18 +59,34 @@ namespace NSL.Management.CentralService.ExternalClient.ASPNET
 
                 var createTime = DateTime.UtcNow;
 
-                (lp as CentralServiceLogProvider).EnqueueLog(new Data.Models.RequestModels.SyncReportLogDataModel() { Content = $"[-1]     APPLICATION - {ex}", CreateTime = DateTime.UtcNow, LogLevel = Data.Enums.LogLevelEnum.Critical});
+                (lp as CentralServiceLogProvider).EnqueueLog(new Data.Models.RequestModels.SyncReportLogDataModel() { Content = $"[-1]     APPLICATION - {ex}", CreateTime = DateTime.UtcNow, LogLevel = Data.Enums.LogLevelEnum.Critical });
 
-                WaitCentralServiceLoggerReport(s.Services);
+                bool finished = false;
+
+                do
+                {
+                    finished = WaitCentralServiceLoggerReport(s.Services);
+                } while (!finished && requireReport);
             };
+
+        }
+
+        public static void AddCentralServiceLoggerReportOnClose(this IHost s, bool requireReport = true)
+        {
+            var lps = s.Services.GetRequiredService<IEnumerable<ILoggerProvider>>();
 
             AppDomain.CurrentDomain.ProcessExit += (sender, e) =>
             {
-                (lp as CentralServiceLogProvider).WaitForReport();
+                bool finished = false;
+
+                do
+                {
+                    finished = WaitCentralServiceLoggerReport(s.Services);
+                } while (!finished && requireReport);
             };
         }
 
-        public static async void WaitCentralServiceLoggerReportAsync(this IServiceProvider s)
+        public static async Task WaitCentralServiceLoggerReportAsync(this IServiceProvider s)
         {
             var lps = s.GetRequiredService<IEnumerable<ILoggerProvider>>();
 

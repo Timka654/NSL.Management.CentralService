@@ -10,17 +10,27 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\NSL.Management.CentralService.ExternalShared\NSL.Management.CentralService.ExternalShared.csproj" />
     <ProjectReference Include="..\..\NSL.Management.CentralService.Shared\NSL.Management.CentralService.Shared.Server.csproj" />
     <ProjectReference Include="..\NSL.Management.CentralService.Client\NSL.Management.CentralService.Client.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.8" />
-    <PackageReference Include="NSL.ASPNET.Identity.Host" Version="2024.8.24.2059" />
-    <PackageReference Include="NSL.ASPNET.Mvc" Version="2024.8.24.2059" />
-    <PackageReference Include="NSL.Database.EntityFramework.ASPNET" Version="2024.8.24.2059" />
-    <PackageReference Include="NSL.Database.EntityFramework.Filter.Host.ASPNET" Version="2024.8.24.2059" />
-    <PackageReference Include="NSL.Refactoring.Shared" Version="2024.8.24.2059">
+    <PackageReference Include="NSL.ASPNET.Identity.Host" Version="2024.10.4.1349" />
+    <PackageReference Include="NSL.ASPNET.Mvc" Version="2024.10.4.1349" />
+    <PackageReference Include="NSL.Database.EntityFramework.ASPNET" Version="2024.10.4.1349" />
+    <PackageReference Include="NSL.Database.EntityFramework.Filter.Host.ASPNET" Version="2024.10.4.1349" />
+    <PackageReference Include="NSL.Refactoring.Shared" Version="2024.10.4.1349">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update=".dockerignore">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Dockerfile">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

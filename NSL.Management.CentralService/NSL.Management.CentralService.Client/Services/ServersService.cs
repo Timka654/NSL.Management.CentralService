@@ -7,6 +7,7 @@ namespace NSL.Management.CentralService.Client.Services
 {
     [HttpEndPointImplementGenerate(typeof(IServerController))]
     [HttpEndPointImplementGenerate(typeof(ILogController))]
+    [HttpEndPointImplementGenerate(typeof(IMetricController))]
     public partial class ServersService(IdentityStateProvider identityStateProvider
         , IHttpClientFactory httpClientFactory
         , ILocalStorageService localStorage)
