@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace NSL.Management.CentralService.ExternalClient.ASPNET
 {
-    public static class StartupExtensions
+    public static partial class StartupExtensions
     {
         public static IServiceCollection AddCentralServiceClient(
             this IServiceCollection collection, Func<CentralServiceClient> build)
@@ -14,9 +14,12 @@ namespace NSL.Management.CentralService.ExternalClient.ASPNET
 
             return collection;
         }
+    }
 
+    public static partial class StartupExtensions
+    {
         public static ILoggingBuilder AddCentralServiceLogger(
-            this ILoggingBuilder builder)
+        this ILoggingBuilder builder)
         {
             builder.Services.AddSingleton<ILoggerProvider>((s) => new CentralServiceLogProvider(s));
 
@@ -31,20 +34,31 @@ namespace NSL.Management.CentralService.ExternalClient.ASPNET
 
             return builder;
         }
+    }
 
-        public static bool WaitCentralServiceLoggerReport(this IServiceProvider s)
+    public static partial class StartupExtensions
+    {
+        public static ILoggingBuilder AddCentralServiceMetricsProvider(
+            this ILoggingBuilder builder)
         {
-            var lps = s.GetRequiredService<IEnumerable<ILoggerProvider>>();
+            builder.Services.AddSingleton<CentralServiceMetricsProvider>();
 
-            var lp = lps.FirstOrDefault(x => x is CentralServiceLogProvider);
-
-            if (lp == null)
-                throw new Exception($"CentralServiceLogProvider not registered!!");
-
-           return (lp as CentralServiceLogProvider).WaitForReport();
+            return builder;
         }
 
-        public static void AddCentralServiceLoggerReportOnUnhandledException(this IHost s, bool requireReport = true)
+        public static ILoggingBuilder AddCentralServiceMetricsProvider(
+            this ILoggingBuilder builder
+            , TimeSpan delayReport)
+        {
+            builder.Services.AddSingleton<CentralServiceMetricsProvider>();
+
+            return builder;
+        }
+    }
+
+    public static partial class StartupExtensions
+    {
+        public static void AddCentralServiceReportOnUnhandledException(this IHost s, bool requireReport = true)
         {
             var lps = s.Services.GetRequiredService<IEnumerable<ILoggerProvider>>();
 
@@ -67,11 +81,17 @@ namespace NSL.Management.CentralService.ExternalClient.ASPNET
                 {
                     finished = WaitCentralServiceLoggerReport(s.Services);
                 } while (!finished && requireReport);
-            };
 
+                finished = false;
+
+                do
+                {
+                    finished = WaitCentralServiceMetricsReport(s.Services);
+                } while (!finished && requireReport);
+            };
         }
 
-        public static void AddCentralServiceLoggerReportOnClose(this IHost s, bool requireReport = true)
+        public static void AddCentralServiceReportOnClose(this IHost s, bool requireReport = true)
         {
             var lps = s.Services.GetRequiredService<IEnumerable<ILoggerProvider>>();
 
@@ -83,19 +103,64 @@ namespace NSL.Management.CentralService.ExternalClient.ASPNET
                 {
                     finished = WaitCentralServiceLoggerReport(s.Services);
                 } while (!finished && requireReport);
+
+                finished = false;
+
+                do
+                {
+                    finished = WaitCentralServiceMetricsReport(s.Services);
+                } while (!finished && requireReport);
             };
         }
+    }
 
-        public static async Task WaitCentralServiceLoggerReportAsync(this IServiceProvider s)
+    public static partial class StartupExtensions
+    {
+        public static bool WaitCentralServiceMetricsReport(this IServiceProvider s)
+        {
+            var lp = s.GetService<CentralServiceMetricsProvider>();
+
+            if (lp == null)
+                return true;
+
+            return lp.WaitForReport();
+        }
+
+        public static async Task<bool> WaitCentralServiceMetricsReportAsync(this IServiceProvider s)
+        {
+            var lp = s.GetService<CentralServiceMetricsProvider>();
+
+            if (lp == null)
+                return true;
+
+            return await (lp).WaitForReportAsync();
+        }
+    }
+
+    public static partial class StartupExtensions
+    {
+        public static bool WaitCentralServiceLoggerReport(this IServiceProvider s)
         {
             var lps = s.GetRequiredService<IEnumerable<ILoggerProvider>>();
 
             var lp = lps.FirstOrDefault(x => x is CentralServiceLogProvider);
 
             if (lp == null)
-                throw new Exception($"CentralServiceLogProvider not registered!!");
+                return true;
 
-            await (lp as CentralServiceLogProvider).WaitForReportAsync();
+            return (lp as CentralServiceLogProvider).WaitForReport();
+        }
+
+        public static async Task<bool> WaitCentralServiceLoggerReportAsync(this IServiceProvider s)
+        {
+            var lps = s.GetRequiredService<IEnumerable<ILoggerProvider>>();
+
+            var lp = lps.FirstOrDefault(x => x is CentralServiceLogProvider);
+
+            if (lp == null)
+                return true;
+
+            return await (lp as CentralServiceLogProvider).WaitForReportAsync();
         }
     }
 }

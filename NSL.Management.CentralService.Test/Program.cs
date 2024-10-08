@@ -50,7 +50,8 @@ namespace NSL.Management.CentralService.Test
                 logger.LogDebug("debugLog test!!");
             });
 
-            app.AddCentralServiceLoggerReportOnClose();
+            app.AddCentralServiceReportOnClose();
+            app.AddCentralServiceReportOnUnhandledException();
 
             DevThrow();
 
