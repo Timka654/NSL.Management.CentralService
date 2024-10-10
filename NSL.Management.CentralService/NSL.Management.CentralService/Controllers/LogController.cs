@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using EFCore.BulkExtensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NSL.ASPNET.Identity.Host;
@@ -40,7 +41,7 @@ namespace NSL.Management.CentralService.Controllers
 
                 var count = await dbContext.ServerLogs
                 .Where(x => x.ServerId == serverId && x.Server.OwnerId == uid)
-                .CountAsync(); ;
+                .CountAsync();
 
                 return this.DataResponse(count);
 
@@ -66,25 +67,20 @@ namespace NSL.Management.CentralService.Controllers
             });
 
         [HttpPostAction]
-        public async Task<IActionResult> Clear([FromBody] ClearLogsRequestModel query)
+        public async Task<IActionResult> Clear([FromBody] EntityFilterQueryModel query)
             => await this.ProcessRequestAsync(async () =>
             {
                 var uid = User.GetId();
 
                 var dbq = dbContext.ServerLogs
                 .Include(x => x.Server)
-                    .Where(x => x.Server.OwnerId == uid && x.ServerId == query.ServerId);
+                .Filter(x => x.Where(x => x.Server.OwnerId == uid), query);
 
-                if (query.From.HasValue)
-                    dbq = dbq.Where(x => x.CreateTime > query.From.Value);
+                var c = dbq.Count;
 
-                if (query.To.HasValue)
-                    dbq = dbq.Where(x => x.CreateTime < query.To.Value);
+                await dbContext.BulkDeleteAsync(dbq.Data);
 
-                var count = await dbq
-                    .ExecuteDeleteAsync();
-
-                return Ok();
+                return Ok(c);
             });
     }
 }

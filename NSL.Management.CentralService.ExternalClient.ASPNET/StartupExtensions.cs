@@ -26,33 +26,33 @@ namespace NSL.Management.CentralService.ExternalClient.ASPNET
             return builder;
         }
 
-        public static IServiceCollection AddCentralServiceLogger(
-            this IServiceCollection services
+        public static ILoggingBuilder AddCentralServiceLogger(
+            this ILoggingBuilder builder
             , TimeSpan delayReport)
         {
-            services.AddSingleton<ILoggerProvider>((s) => new CentralServiceLogProvider(s, delayReport));
+            builder.Services.AddSingleton<ILoggerProvider>((s) => new CentralServiceLogProvider(s, delayReport));
 
-            return services;
+            return builder;
         }
     }
 
     public static partial class StartupExtensions
     {
-        public static ILoggingBuilder AddCentralServiceMetricsProvider(
-            this ILoggingBuilder builder)
+        public static IServiceCollection AddCentralServiceMetricsProvider(
+            this IServiceCollection services)
         {
-            builder.Services.AddSingleton<CentralServiceMetricsProvider>();
+            services.AddSingleton<CentralServiceMetricsProvider>();
 
-            return builder;
+            return services;
         }
 
-        public static ILoggingBuilder AddCentralServiceMetricsProvider(
-            this ILoggingBuilder builder
+        public static IServiceCollection AddCentralServiceMetricsProvider(
+            this IServiceCollection services
             , TimeSpan delayReport)
         {
-            builder.Services.AddSingleton<CentralServiceMetricsProvider>();
+            services.AddSingleton<CentralServiceMetricsProvider>();
 
-            return builder;
+            return services;
         }
     }
 

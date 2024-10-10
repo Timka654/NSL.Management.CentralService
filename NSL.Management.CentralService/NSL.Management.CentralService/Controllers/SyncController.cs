@@ -54,7 +54,8 @@ namespace NSL.Management.CentralService.Controllers
 
                 foreach (var item in query.Metrics.Where(x=>x.OperationType == MetricsOperationType.Increment).ToArray())
                 {
-                    var dbitem = await dbMetrics.FirstOrDefaultAsync(x => x.Name == item.Name && (item.ValidInterval.HasValue && x.CreateTime == item.CreateTime));
+                    var dbitem = await dbMetrics.FirstOrDefaultAsync(x => x.Name == item.Name 
+                    && (item.TimeInterval.HasValue && x.CreateTime == item.CreateTime));
 
                     if (dbitem != null)
                     {
@@ -62,11 +63,11 @@ namespace NSL.Management.CentralService.Controllers
                         continue;
                     }
 
-                    item.OperationType = MetricsOperationType.New;
+                    item.OperationType = MetricsOperationType.Isolate;
                 }
 
                 dbContext.ServerMetrics.AddRange(query.Metrics
-                    .Where(x=>x.OperationType == MetricsOperationType.New)
+                    .Where(x=>x.OperationType == MetricsOperationType.Isolate)
                     .Select(x =>
                 {
                     var log = new ServerMetricsModel();

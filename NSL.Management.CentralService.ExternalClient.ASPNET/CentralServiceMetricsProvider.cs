@@ -36,9 +36,29 @@ namespace NSL.Management.CentralService.ExternalClient.ASPNET
 
             metrics = new ConcurrentBag<SyncReportMetricDataModel>();
 
+            var lr = l.ToList();
+
+            var lgroups = lr
+                .Where(x => x.OperationType == MetricsOperationType.Increment)
+                .GroupBy(x => new { x.Name, x.CreateTime, x.TimeInterval })
+                .ToArray();
+
+            foreach (var item in lgroups.Where(x=>x.Count() > 1))
+            {
+                lr.RemoveAll(x => x.Name == item.Key.Name && x.CreateTime == item.Key.CreateTime);
+                lr.Add(new SyncReportMetricDataModel()
+                {
+                    Name = item.Key.Name,
+                    CreateTime = item.Key.CreateTime,
+                    OperationType = MetricsOperationType.Increment,
+                    TimeInterval = item.Key.TimeInterval,
+                    Value = item.Sum(x => x.Value)
+                });
+            }
+
             var result = await serviceProvider.GetRequiredService<CentralServiceClient>().MetricsReportAsync(new SyncReportMetricsRequestModel()
             {
-                Metrics = l.ToArray()
+                Metrics = lr.ToArray()
             });
 
             if (!result)
@@ -62,17 +82,38 @@ namespace NSL.Management.CentralService.ExternalClient.ASPNET
 
         private AutoResetEvent _clearLocker = new AutoResetEvent(true);
 
-        internal void EnqueueMetric(SyncReportMetricDataModel record)
+        public void EnqueueIncrementMetric(string name, long value, TimeSpan? timeInterval = null)
+        {
+            EnqueueMetric(new ExternalClient.Data.Models.RequestModels.SyncReportMetricDataModel()
+            {
+                Name = name,
+                OperationType = ExternalClient.Data.Models.RequestModels.MetricsOperationType.Increment,
+                TimeInterval = timeInterval,
+                Value = value
+            });
+        }
+
+        public void EnqueueIsolateMetric(string name, long value)
+        {
+            EnqueueMetric(new ExternalClient.Data.Models.RequestModels.SyncReportMetricDataModel()
+            {
+                Name = name,
+                OperationType = ExternalClient.Data.Models.RequestModels.MetricsOperationType.Isolate,
+                Value = value
+            });
+        }
+
+        public void EnqueueMetric(SyncReportMetricDataModel record)
         {
             if (record.OperationType == MetricsOperationType.Increment)
             {
                 if (_increment.TryGetValue(record.Name, out var old_time))
                 {
-                    if (record.ValidInterval.HasValue)
+                    if (record.TimeInterval.HasValue)
                     {
-                        while (record.CreateTime - old_time < record.ValidInterval)
+                        while (record.CreateTime - old_time > record.TimeInterval)
                         {
-                            old_time = old_time + record.ValidInterval.Value;
+                            old_time = old_time + record.TimeInterval.Value;
                         }
                     }
 

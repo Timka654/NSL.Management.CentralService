@@ -32,12 +32,15 @@ namespace NSL.Management.CentralService.ExternalClient.Data.Models.RequestModels
 
         public MetricsOperationType OperationType { get; set; }
 
-        public TimeSpan? ValidInterval { get; set; }
+        /// <summary>
+        /// Time interval
+        /// </summary>
+        public TimeSpan? TimeInterval { get; set; }
     }
 
     public enum MetricsOperationType
     {
         Increment,
-        New
+        Isolate
     }
 }

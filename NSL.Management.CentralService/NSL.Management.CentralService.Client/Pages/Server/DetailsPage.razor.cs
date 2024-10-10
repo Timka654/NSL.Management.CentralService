@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using BlazorBootstrap;
+using Microsoft.AspNetCore.Components;
 using NSL.Database.EntityFramework.Filter;
+using NSL.Database.EntityFramework.Filter.Enums;
 using NSL.Database.EntityFramework.Filter.Models;
 using NSL.Management.CentralService.Client.Services;
 using NSL.Management.CentralService.ExternalClient.Data.Enums;
@@ -12,6 +14,7 @@ namespace NSL.Management.CentralService.Client.Pages.Server
         [Parameter] public Guid DetailId { get; set; }
 
         [Inject] public ServersService ServersService { get; set; }
+        [Inject] public ToastService ToastService { get; set; }
 
 
         ServerModel Details { get; set; }
@@ -46,6 +49,7 @@ namespace NSL.Management.CentralService.Client.Pages.Server
         LogLevelEnum? filterLogsLevel = null;
 
         string? searchLogsText = null;
+        CompareType? searchLogsTextType = CompareType.ContainsIgnoreCase;
 
         bool HaveLogsFilter => filterLogsFrom != null || filterLogsTo != null || filterLogsLevel != null || !string.IsNullOrWhiteSpace(searchLogsText);
 
@@ -88,6 +92,21 @@ namespace NSL.Management.CentralService.Client.Pages.Server
             newLogsCount = logsCount = response.Data.Count;
 
             Logs = response.Data.Data.Reverse().ToList();
+        }
+
+        async Task clearLogItems()
+        {
+            var filter = EntityFilterBuilder
+                .Create()
+                .CreateFilterBlock(x => SetLogsFilters(x).AddFilter(nameof(ServerLogModel.ServerId), Database.EntityFramework.Filter.Enums.CompareType.Equals, DetailId))
+                .AddOrder(nameof(ServerLogModel.CreateTime), false);
+
+            var response = await ServersService.LogClearPostRequest(filter);
+
+            if (!response.IsSuccess)
+                return;
+
+            ToastService.Notify(new ToastMessage() { Message = $"Success removed {response.Data}", Type = ToastType.Success, Title = "Clear action", AutoHide = true, IconName = IconName.Info });
         }
 
 
@@ -154,7 +173,7 @@ namespace NSL.Management.CentralService.Client.Pages.Server
                 if (filterLogsLevel.HasValue)
                     block.AddFilter(nameof(ServerLogModel.LogLevel), Database.EntityFramework.Filter.Enums.CompareType.Equals, filterLogsLevel.Value);
                 if (!string.IsNullOrWhiteSpace(searchLogsText))
-                    block.AddFilter(nameof(ServerLogModel.Content), Database.EntityFramework.Filter.Enums.CompareType.Contains, searchLogsText);
+                    block.AddFilter(nameof(ServerLogModel.Content), searchLogsTextType ?? CompareType.ContainsIgnoreCase, searchLogsText);
             }
 
             return block;
@@ -210,6 +229,10 @@ namespace NSL.Management.CentralService.Client.Pages.Server
         DateTime? filterMetricsTo = null;
 
         string? filterMetricsName = null;
+        CompareType? filterMetricsNameType = CompareType.ContainsIgnoreCase;
+        long metricsCalcDisplayNumber = 0;
+        string metricsCalcDisplayTitle = "";
+        Modal? metricsCalcModalRef = null;
 
         bool HaveMetricsFilter => filterMetricsFrom != null || filterMetricsTo != null || !string.IsNullOrWhiteSpace(filterMetricsName);
 
@@ -218,7 +241,6 @@ namespace NSL.Management.CentralService.Client.Pages.Server
             filterMetricsFrom = null;
             filterMetricsTo = null;
             filterMetricsName = null;
-
             await _loadMetrics();
         }
 
@@ -251,6 +273,95 @@ namespace NSL.Management.CentralService.Client.Pages.Server
             newMetricsCount = metricsCount = response.Data.Count;
 
             Metrics = response.Data.Data.Reverse().ToList();
+        }
+
+        async Task calculateMetricsMin()
+        {
+            var filter = EntityFilterBuilder
+                .Create()
+                .CreateFilterBlock(x => SetMetricsFilters(x).AddFilter(nameof(ServerMetricsModel.ServerId), Database.EntityFramework.Filter.Enums.CompareType.Equals, DetailId));
+
+            var response = await ServersService.MetricCalculateMinPostRequest(filter);
+
+            if (!response.IsSuccess)
+                return;
+
+            string[] titleParts = [
+                "Min",
+                string.IsNullOrWhiteSpace(filterMetricsName) ? null : $"Name contains {filterMetricsName}",
+                filterMetricsFrom == null ? null :  $"from {filterMetricsFrom}",
+                filterMetricsTo == null ? null :  $"to {filterMetricsTo}",
+                ];
+
+
+            metricsCalcDisplayTitle = string.Join(" ", titleParts.Where(x => x != null));
+            metricsCalcDisplayNumber = response.Data;
+
+            await metricsCalcModalRef.ShowAsync();
+        }
+
+        async Task calculateMetricsAvg()
+        {
+            var filter = EntityFilterBuilder
+                .Create()
+                .CreateFilterBlock(x => SetMetricsFilters(x).AddFilter(nameof(ServerMetricsModel.ServerId), Database.EntityFramework.Filter.Enums.CompareType.Equals, DetailId));
+
+            var response = await ServersService.MetricCalculateAvgPostRequest(filter);
+
+            if (!response.IsSuccess)
+                return;
+
+            string[] titleParts = [
+                "Avg",
+                string.IsNullOrWhiteSpace(filterMetricsName) ? null : $"Name contains {filterMetricsName}",
+                filterMetricsFrom == null ? null :  $"from {filterMetricsFrom}",
+                filterMetricsTo == null ? null :  $"to {filterMetricsTo}",
+                ];
+
+
+            metricsCalcDisplayTitle = string.Join(" ", titleParts.Where(x => x != null));
+            metricsCalcDisplayNumber = response.Data;
+
+            await metricsCalcModalRef.ShowAsync();
+        }
+
+        async Task calculateMetricsMax()
+        {
+            var filter = EntityFilterBuilder
+                .Create()
+                .CreateFilterBlock(x => SetMetricsFilters(x).AddFilter(nameof(ServerMetricsModel.ServerId), Database.EntityFramework.Filter.Enums.CompareType.Equals, DetailId));
+
+            var response = await ServersService.MetricCalculateMaxPostRequest(filter);
+
+            if (!response.IsSuccess)
+                return;
+
+            string[] titleParts = [
+                "Max",
+                string.IsNullOrWhiteSpace(filterMetricsName) ? null : $"Name contains {filterMetricsName}",
+                filterMetricsFrom == null ? null :  $"from {filterMetricsFrom}",
+                filterMetricsTo == null ? null :  $"to {filterMetricsTo}",
+                ];
+
+
+            metricsCalcDisplayTitle = string.Join(" ", titleParts.Where(x => x != null));
+            metricsCalcDisplayNumber = response.Data;
+
+            await metricsCalcModalRef.ShowAsync();
+        }
+
+        async Task clearMetricItems()
+        {
+            var filter = EntityFilterBuilder
+                .Create()
+                .CreateFilterBlock(x => SetMetricsFilters(x).AddFilter(nameof(ServerMetricsModel.ServerId), Database.EntityFramework.Filter.Enums.CompareType.Equals, DetailId));
+
+            var response = await ServersService.MetricClearPostRequest(filter);
+
+            if (!response.IsSuccess)
+                return;
+
+            ToastService.Notify(new ToastMessage() { Message = $"Success removed {response.Data}", Type = ToastType.Success, Title = "Clear action", AutoHide = true, IconName = IconName.Info });
         }
 
 
@@ -315,7 +426,7 @@ namespace NSL.Management.CentralService.Client.Pages.Server
                 if (filterMetricsTo.HasValue)
                     block.AddFilter(nameof(ServerMetricsModel.CreateTime), Database.EntityFramework.Filter.Enums.CompareType.Less, filterMetricsTo.Value.ToUniversalTime());
                 if (!string.IsNullOrWhiteSpace(filterMetricsName))
-                    block.AddFilter(nameof(ServerMetricsModel.Name), Database.EntityFramework.Filter.Enums.CompareType.Contains, filterMetricsName);
+                    block.AddFilter(nameof(ServerMetricsModel.Name), filterMetricsNameType ?? CompareType.ContainsIgnoreCase, filterMetricsName);
             }
 
             return block;

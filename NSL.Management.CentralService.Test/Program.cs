@@ -21,9 +21,12 @@ namespace NSL.Management.CentralService.Test
 
             builder.Services.AddCentralServiceClient(() => new ExternalClient.CentralServiceClient()
             {
-                ServerId = Guid.Parse("5fd5459e-bde2-45de-8b80-2b8670b0a3f4"),
-                ServerToken = "33d65a1e-2e7e-4194-8b98-17e3d8f2665de1964618-cd2c-4dc9-9f83-a70b81628468",
+                BaseUrl = "https://devcc.arrible.com/",
+                ServerId = Guid.Parse("aa31fa1b-f543-4747-ae17-b4fb49761d21"),
+                ServerToken = "65499a25-b97c-4493-892a-4d34a26787fd2e5b956f-e680-4428-9d7d-f61fe3519adb",
             });
+
+            builder.Services.AddCentralServiceMetricsProvider();
 
             // Add services to the container.
             builder.Services.AddAuthorization();
@@ -53,16 +56,32 @@ namespace NSL.Management.CentralService.Test
             app.AddCentralServiceReportOnClose();
             app.AddCentralServiceReportOnUnhandledException();
 
+            DevMetrics(app.Services);
+
             DevThrow();
 
             app.Run();
         }
 
+        private static async void DevMetrics(IServiceProvider serviceProvider)
+        {
+            var metrics = serviceProvider.GetRequiredService<CentralServiceMetricsProvider>();
+
+            while (true)
+            {
+                metrics.EnqueueIncrementMetric("inc_splited_5s", 1, TimeSpan.FromSeconds(5));
+                metrics.EnqueueIncrementMetric("inc_full_1", 1);
+                metrics.EnqueueIsolateMetric("new_1", 1);
+
+                await Task.Delay(200);
+            }
+        }
+
         private static async void DevThrow()
         {
-            await Task.Delay(3_000);
+            await Task.Delay(10_000);
 
-            throw new Exception(); 
+            throw new Exception();
         }
     }
 }

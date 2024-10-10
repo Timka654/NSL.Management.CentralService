@@ -6,11 +6,13 @@ using Microsoft.EntityFrameworkCore;
 using NSL.ASPNET.Identity.Host;
 using NSL.Database.EntityFramework.ASPNET;
 using NSL.Management.CentralService.Client.Pages;
+using NSL.Management.CentralService.ExternalClient.Data.Models.RequestModels;
 using NSL.Management.CentralService.Shared.Models;
 using NSL.Management.CentralService.Shared.Server.Data;
 using NSL.Management.CentralService.Shared.Server.Manages;
 using NSL.Management.CentralService.Utils.Sync;
 using System.Net;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace NSL.Management.CentralService
 {
@@ -36,7 +38,7 @@ namespace NSL.Management.CentralService
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseNpgsql(connectionString));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-            
+
 
             builder.Services.AddAPIBaseIdentity<UserModel, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -104,6 +106,90 @@ namespace NSL.Management.CentralService
 
             app.UseBlazorFrameworkFiles();
             app.MapFallbackToFile("index.html");
+
+            //await using var scope = app.Services.CreateAsyncScope();
+            //var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+            //var serverId = Guid.Parse("aa31fa1b-f543-4747-ae17-b4fb49761d21");
+
+            //var query = new SyncReportMetricsRequestModel()
+            //{
+            //    Metrics = [
+            //        new SyncReportMetricDataModel() {
+            //        CreateTime = new DateTime(2024, 10, 08, 14, 56, 55,560,176),
+            //        Name = "dev1",
+            //        OperationType = MetricsOperationType.Increment,
+            //        ValidInterval = TimeSpan.FromSeconds(5),
+            //        Value = 1 },
+            //        new SyncReportMetricDataModel() {
+            //        CreateTime = new DateTime(2024, 10, 08, 14, 56, 55,560,176),
+            //        Name = "dev1",
+            //        OperationType = MetricsOperationType.Increment,
+            //        ValidInterval = TimeSpan.FromSeconds(5),
+            //        Value = 1 },
+            //        new SyncReportMetricDataModel() {
+            //        CreateTime = new DateTime(2024, 10, 08, 14, 56, 55,560,176),
+            //        Name = "dev1",
+            //        OperationType = MetricsOperationType.Increment,
+            //        ValidInterval = TimeSpan.FromSeconds(5),
+            //        Value = 1 },
+            //        new SyncReportMetricDataModel() {
+            //        CreateTime = new DateTime(2024, 10, 08, 14, 56, 55,560,176),
+            //        Name = "dev1",
+            //        OperationType = MetricsOperationType.Increment,
+            //        ValidInterval = TimeSpan.FromSeconds(5),
+            //        Value = 1 },
+            //        new SyncReportMetricDataModel() {
+            //        CreateTime = new DateTime(2024, 10, 08, 14, 56, 55,560,176),
+            //        Name = "dev1",
+            //        OperationType = MetricsOperationType.Increment,
+            //        ValidInterval = TimeSpan.FromSeconds(5),
+            //        Value = 1 },
+            //        new SyncReportMetricDataModel() {
+            //        CreateTime = new DateTime(2024, 10, 08, 14, 56, 55,560,176),
+            //        Name = "dev1",
+            //        OperationType = MetricsOperationType.Increment,
+            //        ValidInterval = TimeSpan.FromSeconds(5),
+            //        Value = 1 },
+            //        new SyncReportMetricDataModel() {
+            //        CreateTime = new DateTime(2024, 10, 08, 14, 56, 55,560,176),
+            //        Name = "dev1",
+            //        OperationType = MetricsOperationType.Increment,
+            //        ValidInterval = TimeSpan.FromSeconds(5),
+            //        Value = 1 }
+            //        ]
+            //};
+
+            //var dbMetrics = dbContext.ServerMetrics.Where(x => x.ServerId == serverId);
+            //foreach (var item in query.Metrics.Where(x => x.OperationType == MetricsOperationType.Increment).ToArray())
+            //{
+            //    var dbitem = await dbMetrics.FirstOrDefaultAsync(x => x.Name == item.Name
+            //    && (item.ValidInterval.HasValue && x.CreateTime == item.CreateTime));
+
+            //    if (dbitem != null)
+            //    {
+            //        dbitem.Value += item.Value;
+            //        continue;
+            //    }
+
+            //    item.OperationType = MetricsOperationType.New;
+            //}
+
+            //dbContext.ServerMetrics.AddRange(query.Metrics
+            //    .Where(x => x.OperationType == MetricsOperationType.New)
+            //    .Select(x =>
+            //    {
+            //        var log = new ServerMetricsModel();
+
+            //        log.FillFrom(x);
+
+            //        log.ServerId = serverId;
+
+            //        return log;
+            //    }));
+
+            //await dbContext.SaveChangesAsync();
+
 
             // Add additional endpoints required by the Identity /Account Razor components.
             //app.MapAdditionalIdentityEndpoints();

@@ -16,7 +16,7 @@ namespace NSL.Management.CentralService.Shared.Controllers
     [HttpEndPointContainerGenerate("api/[controller]")]
     public interface ILogController
     {
-        [HttpEndPointGenerate(typeof(BaseResponse))] Task<IActionResult> Clear([FromBody] ClearLogsRequestModel query);
+        [HttpEndPointGenerate(typeof(DataResponse<int>))] Task<IActionResult> Clear([FromBody] EntityFilterQueryModel query);
 
         [HttpEndPointGenerate(typeof(DataResponse<FilterResultModel<ServerLogModel>>))] Task<IActionResult> Get([FromBody] EntityFilterQueryModel query);
 

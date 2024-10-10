@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using EFCore.BulkExtensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NSL.ASPNET.Identity.Host;
@@ -31,6 +32,53 @@ namespace NSL.Management.CentralService.Controllers
                 return this.DataResponse(await dbq.ToDataResultAsync(x => x.SelectGet()));
 
             });
+
+        [HttpPostAction]
+        public async Task<IActionResult> CalculateMin([FromBody] EntityFilterQueryModel query)
+            => await this.ProcessRequestAsync(async () =>
+            {
+                var uid = User.GetId();
+
+                var dbq = dbContext.ServerMetrics
+                .Include(x => x.Server)
+                .Filter(x => x.Where(x => x.Server.OwnerId == uid), query);
+
+                var r = dbq.Count > 0 ? await dbq.Data.MinAsync(x => x.Value) : 0;
+
+
+                return this.DataResponse(r);
+            });
+
+        [HttpPostAction]
+        public async Task<IActionResult> CalculateAvg([FromBody] EntityFilterQueryModel query)
+            => await this.ProcessRequestAsync(async () =>
+            {
+                var uid = User.GetId();
+
+                var dbq = dbContext.ServerMetrics
+                .Include(x => x.Server)
+                .Filter(x => x.Where(x => x.Server.OwnerId == uid), query);
+
+                var r = dbq.Count > 0 ? await dbq.Data.AverageAsync(x => x.Value) : 0;
+
+                return this.DataResponse(r);
+            });
+
+        [HttpPostAction]
+        public async Task<IActionResult> CalculateMax([FromBody] EntityFilterQueryModel query)
+            => await this.ProcessRequestAsync(async () =>
+            {
+                var uid = User.GetId();
+
+                var dbq = dbContext.ServerMetrics
+                .Include(x => x.Server)
+                .Filter(x => x.Where(x => x.Server.OwnerId == uid), query);
+
+                var r = dbq.Count > 0 ? await dbq.Data.MaxAsync(x => x.Value) : 0;
+
+                return this.DataResponse(r);
+            });
+
         [HttpPostAction]
         public async Task<IActionResult> GetCount([FromBody] Guid serverId)
             => await this.ProcessRequestAsync(async () =>
@@ -39,7 +87,7 @@ namespace NSL.Management.CentralService.Controllers
 
                 var count = await dbContext.ServerMetrics
                 .Where(x => x.ServerId == serverId && x.Server.OwnerId == uid)
-                .CountAsync(); ;
+                .CountAsync();
 
                 return this.DataResponse(count);
 
@@ -65,25 +113,20 @@ namespace NSL.Management.CentralService.Controllers
             });
 
         [HttpPostAction]
-        public async Task<IActionResult> Clear([FromBody] ClearMetricsRequestModel query)
+        public async Task<IActionResult> Clear([FromBody] EntityFilterQueryModel query)
             => await this.ProcessRequestAsync(async () =>
             {
                 var uid = User.GetId();
 
-                var dbq = dbContext.ServerMetrics
+                var dbq = dbContext.ServerLogs
                 .Include(x => x.Server)
-                    .Where(x => x.Server.OwnerId == uid && x.ServerId == query.ServerId);
+                .Filter(x => x.Where(x => x.Server.OwnerId == uid), query);
 
-                if (query.From.HasValue)
-                    dbq = dbq.Where(x => x.CreateTime > query.From.Value);
+                var count = dbq.Count;
 
-                if (query.To.HasValue)
-                    dbq = dbq.Where(x => x.CreateTime < query.To.Value);
+                await dbContext.BulkDeleteAsync(dbq.Data);
 
-                var count = await dbq
-                    .ExecuteDeleteAsync();
-
-                return Ok();
+                return this.DataResponse(count);
             });
     }
 }
