@@ -142,6 +142,19 @@
                             <input type="text" @bind="filterMetricsName" class="form-control" />
                         </div>
                         <div class="mb-3">
+                            <label class="form-label">
+                                <select @bind="filterMetricsValueType">
+                                    <option value="@CompareType.Equals">Equals</option>
+                                    <option value="@CompareType.NotEquals">NotEquals</option>
+                                    <option value="@CompareType.Less">Less</option>
+                                    <option value="@CompareType.EqualsALess">EqualsALess</option>
+                                    <option value="@CompareType.More">More</option>
+                                    <option value="@CompareType.EqualsAMore">EqualsAMore</option>
+                                </select> value
+                            </label>
+                            <input type="number" @bind="filterMetricsValue" class="form-control" />
+                        </div>
+                        <div class="mb-3">
                             <Button Type="ButtonType.Button" @onclick="_loadMetrics">Set</Button>
                             <Button Type="ButtonType.Button" @onclick="clearMetricsFilter">Clear</Button>
                             @if (HaveMetricsFilter)

@@ -16,21 +16,13 @@ namespace NSL.Management.CentralService.ExternalClient.ASPNET
 
         long logId = 0;
 
+        Timer reportTimer;
+
         public CentralServiceLogProvider(IServiceProvider serviceProvider, TimeSpan? delayTime = null)
         {
             this.serviceProvider = serviceProvider;
             this.delayTime = delayTime ?? DefaultReportDelay;
-            reportCycle();
-        }
-
-        private async void reportCycle()
-        {
-            while (true)
-            {
-                await Task.Delay(delayTime);
-
-                logReport();
-            }
+            reportTimer = new Timer((e) => logReport(), null, this.delayTime, this.delayTime);
         }
 
         private async void logReport()

@@ -230,17 +230,22 @@ namespace NSL.Management.CentralService.Client.Pages.Server
 
         string? filterMetricsName = null;
         CompareType? filterMetricsNameType = CompareType.ContainsIgnoreCase;
+
+        long? filterMetricsValue = null;
+        CompareType? filterMetricsValueType = CompareType.Equals;
+
         long metricsCalcDisplayNumber = 0;
         string metricsCalcDisplayTitle = "";
         Modal? metricsCalcModalRef = null;
 
-        bool HaveMetricsFilter => filterMetricsFrom != null || filterMetricsTo != null || !string.IsNullOrWhiteSpace(filterMetricsName);
+        bool HaveMetricsFilter => filterMetricsFrom != null || filterMetricsTo != null || !string.IsNullOrWhiteSpace(filterMetricsName) || filterMetricsValue.HasValue;
 
         async Task clearMetricsFilter()
         {
             filterMetricsFrom = null;
             filterMetricsTo = null;
             filterMetricsName = null;
+            filterMetricsValue = null;
             await _loadMetrics();
         }
 
@@ -425,8 +430,12 @@ namespace NSL.Management.CentralService.Client.Pages.Server
                     block.AddFilter(nameof(ServerMetricsModel.CreateTime), Database.EntityFramework.Filter.Enums.CompareType.More, filterMetricsFrom.Value.ToUniversalTime());
                 if (filterMetricsTo.HasValue)
                     block.AddFilter(nameof(ServerMetricsModel.CreateTime), Database.EntityFramework.Filter.Enums.CompareType.Less, filterMetricsTo.Value.ToUniversalTime());
+                
                 if (!string.IsNullOrWhiteSpace(filterMetricsName))
                     block.AddFilter(nameof(ServerMetricsModel.Name), filterMetricsNameType ?? CompareType.ContainsIgnoreCase, filterMetricsName);
+
+                if (filterMetricsValue.HasValue)
+                    block.AddFilter(nameof(ServerMetricsModel.Value), filterMetricsValueType ?? CompareType.Equals, filterMetricsValue.Value);
             }
 
             return block;

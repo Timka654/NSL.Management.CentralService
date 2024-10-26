@@ -13,21 +13,13 @@ namespace NSL.Management.CentralService.ExternalClient.ASPNET
         private readonly IServiceProvider serviceProvider;
         public TimeSpan delayTime { get; } = DefaultReportDelay;
 
+        Timer reportTimer;
+
         public CentralServiceMetricsProvider(IServiceProvider serviceProvider, TimeSpan? delayTime = null)
         {
             this.serviceProvider = serviceProvider;
             this.delayTime = delayTime ?? DefaultReportDelay;
-            reportCycle();
-        }
-
-        private async void reportCycle()
-        {
-            while (true)
-            {
-                await Task.Delay(delayTime);
-
-                metricReport();
-            }
+            reportTimer = new Timer((e) => metricReport(), null, this.delayTime, this.delayTime);
         }
 
         private async void metricReport()
